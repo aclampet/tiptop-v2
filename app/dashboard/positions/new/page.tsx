@@ -20,15 +20,14 @@ export default function NewPositionPage() {
       title: formData.get('title'),
       start_date: formData.get('start_date'),
       end_date: formData.get('current') ? null : formData.get('end_date'),
-      is_current: !!formData.get('current'),
-      city: formData.get('city') || undefined,
-      state: formData.get('state') || undefined,
-      hr_email: formData.get('hr_email') || undefined,
+      company_city: formData.get('city') || undefined,
+      company_state: formData.get('state') || undefined,
+      company_hr_email: formData.get('hr_email') || undefined,
     }
 
     const workEmail = formData.get('work_email')
     if (workEmail) {
-      payload.work_email = workEmail
+      payload.verification_email = workEmail
     }
 
     try {

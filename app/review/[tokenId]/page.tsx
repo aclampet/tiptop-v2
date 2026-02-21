@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getDeviceFingerprint } from '@/lib/utils'
+
 
 interface ReviewData {
   token: {
