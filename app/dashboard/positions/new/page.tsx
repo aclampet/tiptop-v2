@@ -16,16 +16,14 @@ export default function NewPositionPage() {
     const formData = new FormData(e.currentTarget)
     
     const payload: any = {
+      company_name: formData.get('company_name'),
       title: formData.get('title'),
       start_date: formData.get('start_date'),
       end_date: formData.get('current') ? null : formData.get('end_date'),
       is_current: !!formData.get('current'),
-      company: {
-        name: formData.get('company_name'),
-        city: formData.get('city') || undefined,
-        state: formData.get('state') || undefined,
-        hr_email: formData.get('hr_email') || undefined,
-      }
+      city: formData.get('city') || undefined,
+      state: formData.get('state') || undefined,
+      hr_email: formData.get('hr_email') || undefined,
     }
 
     const workEmail = formData.get('work_email')
