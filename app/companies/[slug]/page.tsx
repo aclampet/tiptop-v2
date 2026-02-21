@@ -61,7 +61,7 @@ export default async function CompanyProfilePage({ params }: { params: { slug: s
     .flatMap((p: any) => Array(p.review_count).fill(p.rating))
   
   const averageRating = allRatings.length > 0
-    ? allRatings.reduce((sum, r) => sum + r, 0) / allRatings.length
+    ? allRatings.reduce((sum: number, r: number) => sum + r, 0) / allRatings.length
     : 0
 
   const totalReviews = company.positions.reduce((sum: number, p: any) => sum + p.review_count, 0)

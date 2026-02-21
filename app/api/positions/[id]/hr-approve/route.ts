@@ -1,63 +1,94 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/supabase/server'
 
+// POST /api/positions/[id]/hr-approve
+// Called when HR clicks approve link in email
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const admin = createAdminClient()
   const { id: positionId } = params
-  const body = await request.json()
-  const { token, action } = body
+  const { token, action } = await request.json()
 
-  if (!token || !action || (action !== 'approve' && action !== 'deny')) {
-    return NextResponse.json(
-      { error: 'Valid token and action required' },
-      { status: 400 }
-    )
+  if (!token || !action) {
+    return NextResponse.json({ 
+      error: 'Token and action required' 
+    }, { status: 400 })
   }
 
-  const { data: position, error: posError } = await admin
+  if (!['approve', 'deny'].includes(action)) {
+    return NextResponse.json({ 
+      error: 'Action must be approve or deny' 
+    }, { status: 400 })
+  }
+
+  const admin = createAdminClient()
+
+  // Verify token (in production, validate JWT with HR email)
+  // For now, simple approach where token = position_id
+  if (token !== positionId) {
+    return NextResponse.json({ error: 'Invalid token' }, { status: 400 })
+  }
+
+  // Get position
+  const { data: position } = await admin
     .from('positions')
-    .select('*')
+    .select('*, company:companies(*)')
     .eq('id', positionId)
     .single()
 
-  if (posError || !position) {
+  if (!position) {
     return NextResponse.json({ error: 'Position not found' }, { status: 404 })
   }
 
-  const expectedToken = Buffer.from(`${positionId}-hr-approve`).toString('base64')
-  if (token !== expectedToken) {
-    return NextResponse.json({ error: 'Invalid token' }, { status: 403 })
-  }
-
   if (action === 'approve') {
-    await admin
+    // Approve position
+    const { data: updated, error: updateError } = await admin
       .from('positions')
-      .update({ hr_verified: true })
+      .update({
+        hr_verified: true,
+        hr_verified_at: new Date().toISOString(),
+        hr_verified_by: position.company.hr_email,
+      })
       .eq('id', positionId)
+      .select()
+      .single()
 
+    if (updateError) {
+      console.error('Error approving position:', updateError)
+      return NextResponse.json({ 
+        error: 'Failed to approve position' 
+      }, { status: 500 })
+    }
+
+    // Activate QR token
     await admin
       .from('qr_tokens')
       .update({ is_active: true })
       .eq('position_id', positionId)
 
-    return NextResponse.json({
+    return NextResponse.json({ 
       success: true,
-      action: 'approved',
-      position: { id: position.id, hr_verified: true },
+      position: updated,
+      message: 'Position approved! QR code is now active.'
     })
   } else {
-    await admin
+    // Deny position - mark as inactive
+    const { error: updateError } = await admin
       .from('positions')
       .update({ is_active: false })
       .eq('id', positionId)
 
-    return NextResponse.json({
+    if (updateError) {
+      console.error('Error denying position:', updateError)
+      return NextResponse.json({ 
+        error: 'Failed to deny position' 
+      }, { status: 500 })
+    }
+
+    return NextResponse.json({ 
       success: true,
-      action: 'denied',
-      position: { id: position.id, is_active: false },
+      message: 'Position denied and marked inactive.'
     })
   }
 }

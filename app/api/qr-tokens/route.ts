@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/supabase/server'
+import { createClient, createAdminClient } from '@/supabase/server'
+import type { CreateQRTokenRequest, UpdateQRTokenRequest } from '@/types'
 
-// GET /api/qr-tokens - Get all QR tokens for a position
+// GET /api/qr-tokens?position_id=xxx - Get QR tokens for a position
 export async function GET(request: NextRequest) {
   const supabase = createClient()
   
@@ -14,11 +15,13 @@ export async function GET(request: NextRequest) {
   const positionId = searchParams.get('position_id')
 
   if (!positionId) {
-    return NextResponse.json({ error: 'position_id required' }, { status: 400 })
+    return NextResponse.json({ error: 'Position ID required' }, { status: 400 })
   }
 
-  // Verify position belongs to authenticated worker
-  const { data: position } = await supabase
+  const admin = createAdminClient()
+
+  // Verify position ownership
+  const { data: position } = await admin
     .from('positions')
     .select('worker_id')
     .eq('id', positionId)
@@ -28,28 +31,29 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Position not found' }, { status: 404 })
   }
 
-  const { data: worker } = await supabase
+  const { data: worker } = await admin
     .from('workers')
     .select('id')
     .eq('auth_user_id', user.id)
     .single()
 
   if (!worker || worker.id !== position.worker_id) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   }
 
   // Get QR tokens for this position
-  const { data: tokens, error } = await supabase
+  const { data: tokens, error } = await admin
     .from('qr_tokens')
     .select('*')
     .eq('position_id', positionId)
     .order('created_at', { ascending: false })
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    console.error('Error fetching QR tokens:', error)
+    return NextResponse.json({ error: 'Failed to fetch QR tokens' }, { status: 500 })
   }
 
-  return NextResponse.json({ tokens })
+  return NextResponse.json({ qr_tokens: tokens || [] })
 }
 
 // POST /api/qr-tokens - Create QR token for position
@@ -61,24 +65,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const body = await request.json()
+  const body: CreateQRTokenRequest = await request.json()
   const { position_id, label } = body
 
   if (!position_id) {
-    return NextResponse.json({ error: 'position_id required' }, { status: 400 })
+    return NextResponse.json({ error: 'Position ID required' }, { status: 400 })
   }
 
-  // Verify position belongs to authenticated worker
-  const { data: position } = await supabase
+  const admin = createAdminClient()
+
+  // Verify position ownership
+  const { data: position } = await admin
     .from('positions')
-    .select(`
-      id,
-      worker_id,
-      title,
-      company:companies!inner (
-        name
-      )
-    `)
+    .select('worker_id, title, company:companies!inner(name)')
     .eq('id', position_id)
     .single()
 
@@ -86,38 +85,39 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Position not found' }, { status: 404 })
   }
 
-  const { data: worker } = await supabase
+  const { data: worker } = await admin
     .from('workers')
     .select('id')
     .eq('auth_user_id', user.id)
     .single()
 
   if (!worker || worker.id !== position.worker_id) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   }
 
   // Create QR token
-  const companyName = (position.company as any).name
-  const defaultLabel = label || `${position.title} at ${companyName}`
-
-  const { data: token, error: tokenError } = await supabase
+  const company = position.company as any
+  const defaultLabel = label || `${position.title} at ${company.name}`
+  
+  const { data: token, error: tokenError } = await admin
     .from('qr_tokens')
     .insert({
       position_id,
       label: defaultLabel,
-      is_active: false, // Will be activated when position is verified
+      is_active: true,  // Active by default (position verification controls access)
     })
     .select()
     .single()
 
   if (tokenError) {
-    return NextResponse.json({ error: tokenError.message }, { status: 500 })
+    console.error('Error creating QR token:', tokenError)
+    return NextResponse.json({ error: 'Failed to create QR token' }, { status: 500 })
   }
 
-  return NextResponse.json({ token })
+  return NextResponse.json({ qr_token: token })
 }
 
-// PATCH /api/qr-tokens - Update QR token
+// PATCH /api/qr-tokens/[id] - Update QR token
 export async function PATCH(request: NextRequest) {
   const supabase = createClient()
   
@@ -126,55 +126,50 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const body = await request.json()
-  const { token_id, label, is_active } = body
+  const url = new URL(request.url)
+  const tokenId = url.pathname.split('/').pop()
 
-  if (!token_id) {
-    return NextResponse.json({ error: 'token_id required' }, { status: 400 })
+  if (!tokenId) {
+    return NextResponse.json({ error: 'Token ID required' }, { status: 400 })
   }
 
-  // Verify token belongs to authenticated worker's position
-  const { data: token } = await supabase
+  const body: UpdateQRTokenRequest = await request.json()
+  const admin = createAdminClient()
+
+  // Verify ownership through position → worker chain
+  const { data: token } = await admin
     .from('qr_tokens')
-    .select(`
-      *,
-      position:positions (
-        worker_id
-      )
-    `)
-    .eq('id', token_id)
+    .select('position_id, position:positions!inner(worker_id)')
+    .eq('id', tokenId)
     .single()
 
   if (!token) {
-    return NextResponse.json({ error: 'Token not found' }, { status: 404 })
+    return NextResponse.json({ error: 'QR token not found' }, { status: 404 })
   }
 
-  const { data: worker } = await supabase
+  const { data: worker } = await admin
     .from('workers')
     .select('id')
     .eq('auth_user_id', user.id)
     .single()
 
-  const positionWorkerId = (token.position as any).worker_id
-  if (!worker || worker.id !== positionWorkerId) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const position = token.position as any
+  if (!worker || worker.id !== position.worker_id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   }
 
   // Update token
-  const updates: any = {}
-  if (label !== undefined) updates.label = label
-  if (is_active !== undefined) updates.is_active = is_active
-
-  const { data: updatedToken, error } = await supabase
+  const { data: updated, error: updateError } = await admin
     .from('qr_tokens')
-    .update(updates)
-    .eq('id', token_id)
+    .update(body)
+    .eq('id', tokenId)
     .select()
     .single()
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  if (updateError) {
+    console.error('Error updating QR token:', updateError)
+    return NextResponse.json({ error: 'Failed to update QR token' }, { status: 500 })
   }
 
-  return NextResponse.json({ token: updatedToken })
+  return NextResponse.json({ qr_token: updated })
 }

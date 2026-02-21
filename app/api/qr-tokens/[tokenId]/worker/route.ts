@@ -5,49 +5,63 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { tokenId: string } }
 ) {
-  const admin = createAdminClient()
   const { tokenId } = params
+  const admin = createAdminClient()
 
-  // Get QR token with position, worker, and company details
-  const { data: token, error } = await admin
+  const { data: token, error: tokenError } = await admin
     .from('qr_tokens')
     .select(`
-      *,
+      id,
+      label,
+      scan_count,
+      is_active,
       position:positions (
-        *,
-        worker:workers (*),
-        company:companies (*)
+        id,
+        title,
+        rating,
+        review_count,
+        email_verified,
+        hr_verified,
+        worker:workers (
+          id,
+          display_name,
+          slug,
+          avatar_url,
+          overall_rating,
+          total_reviews
+        ),
+        company:companies (
+          id,
+          name,
+          city,
+          state,
+          verification_status
+        )
       )
     `)
     .eq('id', tokenId)
     .single()
 
-  if (error || !token) {
-    return NextResponse.json(
-      { error: 'QR code not found' },
-      { status: 404 }
-    )
+  if (tokenError || !token) {
+    return NextResponse.json({ error: 'QR code not found' }, { status: 404 })
   }
 
-  // Check if QR code is active
   if (!token.is_active) {
-    return NextResponse.json(
-      { error: 'This QR code is no longer active' },
-      { status: 410 }
-    )
+    return NextResponse.json({ 
+      error: 'This QR code is no longer active' 
+    }, { status: 410 })
   }
 
-  // Check if position is verified
-  const position = token.position
-  const isVerified = position.email_verified || position.hr_verified
+  const position = token.position as any
+  const worker = position.worker as any
+  const company = position.company as any
 
-  // Increment scan count (fire and forget - don't await)
   void admin
     .from('qr_tokens')
     .update({ scan_count: (token.scan_count || 0) + 1 })
     .eq('id', tokenId)
 
-  return NextResponse.json({
+  return NextResponse.json({ 
     token: {
       id: token.id,
       label: token.label,
@@ -57,22 +71,22 @@ export async function GET(
       title: position.title,
       rating: position.rating,
       review_count: position.review_count,
-      is_verified: isVerified,
+      is_verified: position.email_verified || position.hr_verified,
     },
     worker: {
-      id: position.worker.id,
-      display_name: position.worker.display_name,
-      slug: position.worker.slug,
-      avatar_url: position.worker.avatar_url,
-      overall_rating: position.worker.overall_rating,
-      total_reviews: position.worker.total_reviews,
+      id: worker.id,
+      display_name: worker.display_name,
+      slug: worker.slug,
+      avatar_url: worker.avatar_url,
+      overall_rating: worker.overall_rating,
+      total_reviews: worker.total_reviews,
     },
     company: {
-      id: position.company.id,
-      name: position.company.name,
-      city: position.company.city,
-      state: position.company.state,
-      verification_status: position.company.verification_status,
+      id: company.id,
+      name: company.name,
+      city: company.city,
+      state: company.state,
+      verification_status: company.verification_status,
     },
   })
 }
