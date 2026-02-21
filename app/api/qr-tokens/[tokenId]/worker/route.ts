@@ -41,13 +41,11 @@ export async function GET(
   const position = token.position
   const isVerified = position.email_verified || position.hr_verified
 
-  // Increment scan count (non-blocking)
-  admin
+  // Increment scan count (fire and forget - don't await)
+  void admin
     .from('qr_tokens')
     .update({ scan_count: (token.scan_count || 0) + 1 })
     .eq('id', tokenId)
-    .then(() => {})
-    .catch((err: any) => console.error('Failed to update scan count:', err))
 
   return NextResponse.json({
     token: {
