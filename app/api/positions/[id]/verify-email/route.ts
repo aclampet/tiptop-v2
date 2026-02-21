@@ -1,73 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/supabase/server'
 
-// POST /api/positions/[id]/verify-email
-// Called when user clicks verification link in email
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const admin = createAdminClient()
   const { id: positionId } = params
-  const { token } = await request.json()
+  const body = await request.json()
+  const { token } = body
 
   if (!token) {
-    return NextResponse.json({ error: 'Verification token required' }, { status: 400 })
+    return NextResponse.json({ error: 'Token required' }, { status: 400 })
   }
 
-  const admin = createAdminClient()
-
-  // Verify token (in production, you'd validate a JWT or signed token)
-  // For now, we'll use a simple approach where token = position_id
-  if (token !== positionId) {
-    return NextResponse.json({ error: 'Invalid verification token' }, { status: 400 })
-  }
-
-  // Get position with company
-  const { data: position, error: positionError } = await admin
+  const { data: position, error: posError } = await admin
     .from('positions')
-    .select('*, company:companies(*)')
+    .select('*, company:companies!inner(*)')
     .eq('id', positionId)
     .single()
 
-  if (positionError || !position) {
+  if (posError || !position) {
     return NextResponse.json({ error: 'Position not found' }, { status: 404 })
   }
 
-  // Verify email domain matches company domain
-  if (!position.verification_email || !position.company.email_domain) {
-    return NextResponse.json({ 
-      error: 'Position not eligible for email verification' 
-    }, { status: 400 })
+  const company = position.company as any
+  const expectedToken = Buffer.from(`${positionId}-verify`).toString('base64')
+  
+  if (token !== expectedToken) {
+    return NextResponse.json({ error: 'Invalid token' }, { status: 403 })
   }
 
-  const emailDomain = position.verification_email.split('@')[1]?.toLowerCase()
-  const companyDomain = position.company.email_domain.toLowerCase()
-
-  if (emailDomain !== companyDomain) {
-    return NextResponse.json({ 
-      error: 'Email domain does not match company domain' 
-    }, { status: 400 })
+  if (!company.email_domain) {
+    return NextResponse.json(
+      { error: 'Company does not have email domain verification enabled' },
+      { status: 400 }
+    )
   }
 
-  // Mark position as email verified
-  const { data: updated, error: updateError } = await admin
+  const { error: updateError } = await admin
     .from('positions')
-    .update({
-      email_verified: true,
-      email_verified_at: new Date().toISOString(),
-    })
+    .update({ email_verified: true })
     .eq('id', positionId)
-    .select()
-    .single()
 
   if (updateError) {
-    console.error('Error verifying position:', updateError)
-    return NextResponse.json({ 
-      error: 'Failed to verify position' 
-    }, { status: 500 })
+    return NextResponse.json({ error: updateError.message }, { status: 500 })
   }
 
-  // Activate QR token for this position
   await admin
     .from('qr_tokens')
     .update({ is_active: true })
@@ -75,7 +54,6 @@ export async function POST(
 
   return NextResponse.json({ 
     success: true,
-    position: updated,
-    message: 'Position verified! Your QR code is now active.'
+    position: { id: position.id, email_verified: true },
   })
 }
