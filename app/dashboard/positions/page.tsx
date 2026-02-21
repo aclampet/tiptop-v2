@@ -1,16 +1,11 @@
-import { redirect, notFound } from 'next/navigation'
+import { redirect } from 'next/navigation'
 import { createClient } from '@/supabase/server'
 import Link from 'next/link'
 import { formatRating, formatDateRange, getDurationMonths, formatDuration } from '@/lib/utils'
-import VerificationActions from './VerificationActions'
 
 export const dynamic = 'force-dynamic'
 
-export default async function PositionDetailPage({
-  params,
-}: {
-  params: { id: string }
-}) {
+export default async function PositionsPage() {
   const supabase = createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -25,260 +20,183 @@ export default async function PositionDetailPage({
 
   if (!worker) redirect('/signup')
 
-  // Get position with company and reviews
-  const { data: position, error } = await supabase
+  // Get all positions with company details
+  const { data: positions } = await supabase
     .from('positions')
     .select(`
       *,
-      company:companies (*),
-      reviews (*),
-      qr_tokens (*)
+      company:companies (*)
     `)
-    .eq('id', params.id)
     .eq('worker_id', worker.id)
-    .single()
+    .order('start_date', { ascending: false })
 
-  if (error || !position) {
-    notFound()
-  }
+  const activePositions = positions?.filter(p => p.is_active) || []
+  const inactivePositions = positions?.filter(p => !p.is_active) || []
 
+  return (
+    <div className="p-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-2">Your Positions</h1>
+          <p className="text-ink-400">
+            Manage your work history and verification status
+          </p>
+        </div>
+        <Link
+          href="/dashboard/positions/new"
+          className="bg-brand-600 hover:bg-brand-500 text-white px-6 py-3 rounded-lg font-semibold transition-all"
+        >
+          + Add Position
+        </Link>
+      </div>
+
+      {/* Empty State */}
+      {(!positions || positions.length === 0) && (
+        <div className="text-center py-20 bg-white/5 border border-white/10 rounded-xl">
+          <div className="text-6xl mb-6">💼</div>
+          <h2 className="text-2xl font-semibold text-white mb-4">
+            No positions yet
+          </h2>
+          <p className="text-ink-400 mb-8 max-w-md mx-auto">
+            Add your current or past positions to start collecting reviews and building your portable professional reputation.
+          </p>
+          <Link
+            href="/dashboard/positions/new"
+            className="inline-block bg-brand-600 hover:bg-brand-500 text-white px-8 py-4 rounded-lg font-semibold transition-all"
+          >
+            Add Your First Position
+          </Link>
+        </div>
+      )}
+
+      {/* Active Positions */}
+      {activePositions.length > 0 && (
+        <div className="mb-12">
+          <h2 className="text-xl font-semibold text-white mb-4">
+            Active Positions ({activePositions.length})
+          </h2>
+          <div className="space-y-4">
+            {activePositions.map((position) => (
+              <PositionCard key={position.id} position={position} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Inactive Positions */}
+      {inactivePositions.length > 0 && (
+        <div>
+          <h2 className="text-xl font-semibold text-white mb-4">
+            Past Positions ({inactivePositions.length})
+          </h2>
+          <div className="space-y-4">
+            {inactivePositions.map((position) => (
+              <PositionCard key={position.id} position={position} inactive />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function PositionCard({ 
+  position, 
+  inactive = false 
+}: { 
+  position: any
+  inactive?: boolean
+}) {
   const isVerified = position.email_verified || position.hr_verified
   const dateRange = formatDateRange(position.start_date, position.end_date)
   const duration = formatDuration(getDurationMonths(position.start_date, position.end_date))
-
-  const verificationBadge = position.email_verified
-    ? { text: 'Email Verified', color: 'green', icon: '✓' }
+  
+  const verificationBadge = position.email_verified 
+    ? { text: 'Email Verified', color: 'green' }
     : position.hr_verified
-    ? { text: 'HR Verified', color: 'green', icon: '✓' }
+    ? { text: 'HR Verified', color: 'green' }
     : position.company.verification_status === 'verified'
-    ? { text: 'Pending Verification', color: 'yellow', icon: '⏳' }
+    ? { text: 'Pending Verification', color: 'yellow' }
     : position.company.verification_status === 'registered'
-    ? { text: 'Pending HR Approval', color: 'yellow', icon: '⏳' }
-    : { text: 'Unverified', color: 'gray', icon: '○' }
-
-  const reviews = position.reviews || []
-  const qrToken = position.qr_tokens?.[0] || null
+    ? { text: 'Pending HR Approval', color: 'yellow' }
+    : { text: 'Unverified', color: 'gray' }
 
   return (
-    <div className="p-8 max-w-4xl">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-ink-400 mb-6">
-        <Link href="/dashboard/positions" className="hover:text-white transition-colors">
-          Positions
-        </Link>
-        <span>/</span>
-        <span className="text-white">{position.title}</span>
-      </div>
-
-      {/* Header */}
-      <div className="flex items-start justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-white mb-2">{position.title}</h1>
-          <div className="flex items-center gap-2 mb-1">
-            <p className="text-lg text-ink-300">{position.company.name}</p>
-            {position.company.verification_status === 'verified' && (
-              <span className="text-brand-400 text-sm">✓ Verified Company</span>
-            )}
-          </div>
-          {position.company.city && position.company.state && (
-            <p className="text-sm text-ink-500">
-              {position.company.city}, {position.company.state}
-            </p>
-          )}
-        </div>
-        <span className={`px-4 py-2 rounded-full text-sm font-medium ${
-          verificationBadge.color === 'green'
-            ? 'bg-green-500/10 text-green-400 border border-green-500/20'
-            : verificationBadge.color === 'yellow'
-            ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
-            : 'bg-gray-500/10 text-gray-400 border border-gray-500/20'
-        }`}>
-          {verificationBadge.icon} {verificationBadge.text}
-        </span>
-      </div>
-
-      {/* Stats Row */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
-        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-          <div className="text-2xl mb-1">⭐</div>
-          <div className="text-2xl font-bold text-white">
-            {position.rating > 0 ? formatRating(position.rating) : '—'}
-          </div>
-          <div className="text-sm text-ink-400">Rating</div>
-        </div>
-        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-          <div className="text-2xl mb-1">💬</div>
-          <div className="text-2xl font-bold text-white">{position.review_count}</div>
-          <div className="text-sm text-ink-400">Reviews</div>
-        </div>
-        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-          <div className="text-2xl mb-1">📅</div>
-          <div className="text-2xl font-bold text-white">{duration}</div>
-          <div className="text-sm text-ink-400">Duration</div>
-        </div>
-        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-          <div className="text-2xl mb-1">📱</div>
-          <div className="text-2xl font-bold text-white">{qrToken?.scan_count || 0}</div>
-          <div className="text-sm text-ink-400">QR Scans</div>
-        </div>
-      </div>
-
-      {/* Position Details */}
-      <div className="bg-white/5 border border-white/10 rounded-xl p-6 mb-8">
-        <h2 className="text-lg font-semibold text-white mb-4">Position Details</h2>
-        <div className="grid grid-cols-2 gap-y-4 gap-x-8">
-          <div>
-            <div className="text-sm text-ink-500 mb-1">Title</div>
-            <div className="text-white">{position.title}</div>
-          </div>
-          <div>
-            <div className="text-sm text-ink-500 mb-1">Company</div>
-            <div className="text-white">{position.company.name}</div>
-          </div>
-          <div>
-            <div className="text-sm text-ink-500 mb-1">Date Range</div>
-            <div className="text-white">{dateRange}</div>
-          </div>
-          <div>
-            <div className="text-sm text-ink-500 mb-1">Status</div>
-            <div className="text-white">{position.is_active ? 'Active' : 'Inactive'}</div>
-          </div>
-          {position.verification_email && (
-            <div>
-              <div className="text-sm text-ink-500 mb-1">Verification Email</div>
-              <div className="text-white">{position.verification_email}</div>
-            </div>
-          )}
-          {position.company.industry && (
-            <div>
-              <div className="text-sm text-ink-500 mb-1">Industry</div>
-              <div className="text-white">{position.company.industry}</div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Verification Section - Show if NOT verified */}
-      {!isVerified && (
-        <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-xl p-6 mb-8">
-          <div className="flex items-start gap-4">
-            <div className="text-3xl">⚠️</div>
+    <Link
+      href={`/dashboard/positions/${position.id}`}
+      className={`block bg-white/5 border border-white/10 hover:border-brand-500/50 rounded-xl p-6 transition-all ${
+        inactive ? 'opacity-60' : ''
+      }`}
+    >
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex-1">
+          <div className="flex items-start gap-3 mb-2">
             <div className="flex-1">
-              <h2 className="text-lg font-semibold text-yellow-400 mb-2">
-                Position Not Yet Verified
-              </h2>
-              <p className="text-ink-300 mb-4">
-                {position.company.verification_status === 'unverified'
-                  ? 'This company has not been verified yet. Submit a verification request to get your position verified, or update the company details and resubmit.'
-                  : position.company.verification_status === 'registered'
-                  ? 'A verification request has been sent to your company\'s HR department. You can resend the request or update your information if needed.'
-                  : 'Your company is verified but your position still needs verification. Resend the verification email or update your verification email address.'}
-              </p>
-              <VerificationActions
-                positionId={position.id}
-                companyId={position.company.id}
-                companyName={position.company.name}
-                companyVerificationStatus={position.company.verification_status}
-                verificationEmail={position.verification_email}
-                companyEmailDomain={position.company.email_domain}
-                companyHrEmail={position.company.hr_email}
-                workerName={worker.display_name}
-                positionTitle={position.title}
-                startDate={position.start_date}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Verified Success Banner */}
-      {isVerified && (
-        <div className="bg-green-500/5 border border-green-500/20 rounded-xl p-6 mb-8">
-          <div className="flex items-center gap-4">
-            <div className="text-3xl">✅</div>
-            <div>
-              <h2 className="text-lg font-semibold text-green-400 mb-1">Position Verified</h2>
-              <p className="text-ink-300">
-                {position.email_verified
-                  ? `Verified via email on ${new Date(position.email_verified_at!).toLocaleDateString()}`
-                  : `Verified by HR on ${new Date(position.hr_verified_at!).toLocaleDateString()}`}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* QR Code Section */}
-      {qrToken && (
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6 mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-white mb-1">QR Code</h2>
-              <p className="text-ink-400 text-sm">
-                {qrToken.is_active
-                  ? `Active — ${qrToken.scan_count} scans`
-                  : 'Inactive — Verify your position to activate'}
-              </p>
-            </div>
-            <Link
-              href="/dashboard/qr"
-              className="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all"
-            >
-              Manage QR Codes
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {/* Recent Reviews */}
-      <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-white">Reviews</h2>
-          {reviews.length > 0 && (
-            <Link
-              href="/dashboard/reviews"
-              className="text-brand-400 hover:text-brand-300 text-sm transition-colors"
-            >
-              View all →
-            </Link>
-          )}
-        </div>
-
-        {reviews.length === 0 ? (
-          <div className="text-center py-8">
-            <div className="text-4xl mb-3">💬</div>
-            <p className="text-ink-400">No reviews yet</p>
-            <p className="text-ink-500 text-sm mt-1">
-              {isVerified
-                ? 'Share your QR code to start collecting reviews'
-                : 'Verify your position to start collecting reviews'}
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {reviews.slice(0, 5).map((review: any) => (
-              <div key={review.id} className="border-b border-white/10 pb-4 last:border-0 last:pb-0">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-yellow-400">
-                      {'⭐'.repeat(review.rating)}
-                    </span>
-                    <span className="text-sm text-ink-400">
-                      {review.reviewer_name || 'Anonymous'}
-                    </span>
-                  </div>
-                  <span className="text-xs text-ink-500">
-                    {new Date(review.created_at).toLocaleDateString()}
-                  </span>
-                </div>
-                {review.comment && (
-                  <p className="text-ink-300 text-sm">{review.comment}</p>
+              <h3 className="text-xl font-semibold text-white mb-1">
+                {position.title}
+              </h3>
+              <div className="flex items-center gap-2">
+                <p className="text-ink-300">{position.company.name}</p>
+                {position.company.verification_status === 'verified' && (
+                  <span className="text-brand-400 text-sm">✓</span>
                 )}
               </div>
-            ))}
+              {position.company.city && position.company.state && (
+                <p className="text-sm text-ink-500 mt-1">
+                  {position.company.city}, {position.company.state}
+                </p>
+              )}
+            </div>
           </div>
-        )}
+
+          <div className="flex items-center gap-4 text-sm text-ink-400 mb-3">
+            <div>{dateRange}</div>
+            <div>•</div>
+            <div>{duration}</div>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-lg">⭐</span>
+              <span className="text-white font-semibold">
+                {position.rating > 0 ? formatRating(position.rating) : '—'}
+              </span>
+              <span className="text-ink-500">
+                ({position.review_count} reviews)
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-end gap-2">
+          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+            verificationBadge.color === 'green'
+              ? 'bg-green-500/10 text-green-400'
+              : verificationBadge.color === 'yellow'
+              ? 'bg-yellow-500/10 text-yellow-400'
+              : 'bg-gray-500/10 text-gray-400'
+          }`}>
+            {verificationBadge.text}
+          </span>
+          {inactive && (
+            <span className="px-3 py-1 bg-ink-800 text-ink-400 rounded-full text-xs font-medium">
+              Inactive
+            </span>
+          )}
+        </div>
       </div>
-    </div>
+
+      {/* Quick Stats */}
+      <div className="flex items-center gap-4 pt-4 border-t border-white/10">
+        <div className="text-sm text-ink-400">
+          <span className="text-ink-500">QR Scans:</span> 0
+        </div>
+        <div className="text-sm text-ink-400">
+          <span className="text-ink-500">Last review:</span>{' '}
+          {position.review_count > 0 ? 'Recently' : 'No reviews yet'}
+        </div>
+      </div>
+    </Link>
   )
 }
