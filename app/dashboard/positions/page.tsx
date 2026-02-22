@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/supabase/server'
+import { createClient, createAdminClient } from '@/supabase/server'
 import Link from 'next/link'
 import { formatRating, formatDateRange, getDurationMonths, formatDuration } from '@/lib/utils'
 
@@ -7,12 +7,13 @@ export const dynamic = 'force-dynamic'
 
 export default async function PositionsPage() {
   const supabase = createClient()
+  const admin = createAdminClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
   // Get worker
-  const { data: worker } = await supabase
+  const { data: worker } = await admin
     .from('workers')
     .select('id, display_name')
     .eq('auth_user_id', user.id)
@@ -21,7 +22,7 @@ export default async function PositionsPage() {
   if (!worker) redirect('/signup')
 
   // Get all positions with company details
-  const { data: positions } = await supabase
+  const { data: positions } = await admin
     .from('positions')
     .select(`
       *,

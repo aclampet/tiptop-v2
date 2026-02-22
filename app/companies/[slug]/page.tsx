@@ -182,6 +182,14 @@ export default async function CompanyProfilePage({ params }: { params: { slug: s
       {/* Footer */}
       <div className="border-t border-white/10 bg-white/5">
         <div className="max-w-4xl mx-auto px-6 py-8 text-center">
+          <div className="flex items-center justify-center gap-6 mb-4">
+            <a
+              href={`/companies/${params.slug}/manage`}
+              className="text-brand-400 hover:text-brand-300 text-sm transition-colors"
+            >
+              Manage this company →
+            </a>
+          </div>
           <p className="text-ink-500 text-sm mb-2">
             Company profiles on TipTop.review showcase verified employee work history and reviews
           </p>

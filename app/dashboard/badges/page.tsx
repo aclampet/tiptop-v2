@@ -1,15 +1,16 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/supabase/server'
+import { createClient, createAdminClient } from '@/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
 export default async function BadgesPage() {
   const supabase = createClient()
+  const admin = createAdminClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: worker } = await supabase
+  const { data: worker } = await admin
     .from('workers')
     .select('id, display_name')
     .eq('auth_user_id', user.id)
@@ -18,7 +19,7 @@ export default async function BadgesPage() {
   if (!worker) redirect('/signup')
 
   // Get worker's badges
-  const { data: workerBadges } = await supabase
+  const { data: workerBadges } = await admin
     .from('worker_badges')
     .select(`
       *,
@@ -28,7 +29,7 @@ export default async function BadgesPage() {
     .order('awarded_at', { ascending: false })
 
   // Get all available badges for context
-  const { data: allBadges } = await supabase
+  const { data: allBadges } = await admin
     .from('badges')
     .select('*')
     .order('tier', { ascending: true })

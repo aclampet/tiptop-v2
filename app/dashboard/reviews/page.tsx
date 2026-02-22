@@ -1,17 +1,18 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/supabase/server'
+import { createClient, createAdminClient } from '@/supabase/server'
 import { formatDate } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
 export default async function ReviewsPage() {
   const supabase = createClient()
+  const admin = createAdminClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
   // Get worker
-  const { data: worker } = await supabase
+  const { data: worker } = await admin
     .from('workers')
     .select('id')
     .eq('auth_user_id', user.id)
@@ -20,7 +21,7 @@ export default async function ReviewsPage() {
   if (!worker) redirect('/signup')
 
   // Get all positions
-  const { data: positions } = await supabase
+  const { data: positions } = await admin
     .from('positions')
     .select('id, title, company:companies(name)')
     .eq('worker_id', worker.id)
@@ -28,18 +29,20 @@ export default async function ReviewsPage() {
   const positionIds = positions?.map(p => p.id) || []
 
   // Get all reviews across positions
-  const { data: reviews } = await supabase
-    .from('reviews')
-    .select(`
-      *,
-      position:positions (
-        id,
-        title,
-        company:companies (name)
-      )
-    `)
-    .in('position_id', positionIds)
-    .order('created_at', { ascending: false })
+  const { data: reviews } = positionIds.length > 0
+    ? await admin
+        .from('reviews')
+        .select(`
+          *,
+          position:positions (
+            id,
+            title,
+            company:companies (name)
+          )
+        `)
+        .in('position_id', positionIds)
+        .order('created_at', { ascending: false })
+    : { data: [] as any[] }
 
   // Group reviews by position
   const reviewsByPosition = reviews?.reduce((acc: any, review: any) => {

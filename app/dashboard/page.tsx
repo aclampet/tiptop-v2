@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/supabase/server'
+import { createClient, createAdminClient } from '@/supabase/server'
 import Link from 'next/link'
 import { formatRating, formatDateRange } from '@/lib/utils'
 
@@ -7,12 +7,13 @@ export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
   const supabase = createClient()
+  const admin = createAdminClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
   // Get worker with positions
-  const { data: worker } = await supabase
+  const { data: worker } = await admin
     .from('workers')
     .select(`
       *,
@@ -27,19 +28,22 @@ export default async function DashboardPage() {
   if (!worker) redirect('/signup')
 
   // Get recent reviews across all positions
-  const { data: recentReviews } = await supabase
-    .from('reviews')
-    .select(`
-      *,
-      position:positions (
-        id,
-        title,
-        company:companies (name)
-      )
-    `)
-    .in('position_id', worker.positions.map((p: any) => p.id))
-    .order('created_at', { ascending: false })
-    .limit(5)
+  const positionIds = worker.positions.map((p: any) => p.id)
+  const { data: recentReviews } = positionIds.length > 0
+    ? await admin
+        .from('reviews')
+        .select(`
+          *,
+          position:positions (
+            id,
+            title,
+            company:companies (name)
+          )
+        `)
+        .in('position_id', positionIds)
+        .order('created_at', { ascending: false })
+        .limit(5)
+    : { data: [] }
 
   const activePositions = worker.positions.filter((p: any) => p.is_active)
   const verifiedPositions = worker.positions.filter((p: any) => 

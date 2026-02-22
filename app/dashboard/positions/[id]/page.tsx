@@ -1,5 +1,5 @@
 import { redirect, notFound } from 'next/navigation'
-import { createClient } from '@/supabase/server'
+import { createClient, createAdminClient } from '@/supabase/server'
 import Link from 'next/link'
 import { formatRating, formatDateRange, getDurationMonths, formatDuration } from '@/lib/utils'
 import VerificationActions from './VerificationActions'
@@ -13,12 +13,13 @@ export default async function PositionDetailPage({
   params: { id: string }
 }) {
   const supabase = createClient()
+  const admin = createAdminClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
   // Get worker
-  const { data: worker } = await supabase
+  const { data: worker } = await admin
     .from('workers')
     .select('id, display_name')
     .eq('auth_user_id', user.id)
@@ -27,7 +28,7 @@ export default async function PositionDetailPage({
   if (!worker) redirect('/signup')
 
   // Get position with company and reviews
-  const { data: position, error } = await supabase
+  const { data: position, error } = await admin
     .from('positions')
     .select(`
       *,
