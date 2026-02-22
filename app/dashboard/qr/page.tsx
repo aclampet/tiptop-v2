@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/supabase/server'
+import { createClient, createAdminClient } from '@/supabase/server'
 import QRCodeDisplay from '@/components/qr/QRCodeDisplay'
+import GenerateQRButton from './GenerateQRButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,8 +11,10 @@ export default async function QRCodesPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const admin = createAdminClient()
+
   // Get worker
-  const { data: worker } = await supabase
+  const { data: worker } = await admin
     .from('workers')
     .select('id')
     .eq('auth_user_id', user.id)
@@ -19,8 +22,8 @@ export default async function QRCodesPage() {
 
   if (!worker) redirect('/signup')
 
-  // Get all positions with QR tokens
-  const { data: positions } = await supabase
+  // Get all active positions with QR tokens
+  const { data: positions } = await admin
     .from('positions')
     .select(`
       *,
@@ -31,7 +34,7 @@ export default async function QRCodesPage() {
     .eq('is_active', true)
     .order('start_date', { ascending: false })
 
-  const activePositions = positions?.filter(p => p.qr_tokens && p.qr_tokens.length > 0) || []
+  const positionsWithQR = positions?.filter(p => p.qr_tokens && p.qr_tokens.length > 0) || []
   const positionsWithoutQR = positions?.filter(p => !p.qr_tokens || p.qr_tokens.length === 0) || []
 
   return (
@@ -64,9 +67,9 @@ export default async function QRCodesPage() {
       )}
 
       {/* Positions with QR Codes */}
-      {activePositions.length > 0 && (
+      {positionsWithQR.length > 0 && (
         <div className="space-y-8">
-          {activePositions.map((position) => (
+          {positionsWithQR.map((position) => (
             <div key={position.id} className="bg-white/5 border border-white/10 rounded-xl p-6">
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-white mb-1">
@@ -79,7 +82,6 @@ export default async function QRCodesPage() {
                   )}
                 </p>
                 
-                {/* Verification Status */}
                 <div className="mt-3">
                   {position.email_verified || position.hr_verified ? (
                     <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-500/10 text-green-400 text-sm rounded-full">
@@ -95,7 +97,6 @@ export default async function QRCodesPage() {
                 </div>
               </div>
 
-              {/* QR Code Display */}
               {position.qr_tokens && position.qr_tokens[0] && (
                 <QRCodeDisplay 
                   token={position.qr_tokens[0]}
@@ -108,11 +109,11 @@ export default async function QRCodesPage() {
         </div>
       )}
 
-      {/* Positions Without QR */}
+      {/* Positions Without QR — with generate button */}
       {positionsWithoutQR.length > 0 && (
         <div className="mt-8">
           <h2 className="text-lg font-semibold text-white mb-4">
-            Positions Without QR Codes
+            Positions Missing QR Codes
           </h2>
           <div className="space-y-3">
             {positionsWithoutQR.map((position) => (
@@ -124,9 +125,10 @@ export default async function QRCodesPage() {
                   <p className="text-white font-medium">{position.title}</p>
                   <p className="text-sm text-ink-400">{position.company.name}</p>
                 </div>
-                <p className="text-sm text-ink-500">
-                  QR codes are auto-created when you add a position
-                </p>
+                <GenerateQRButton
+                  positionId={position.id}
+                  label={`${position.title} at ${position.company.name}`}
+                />
               </div>
             ))}
           </div>
