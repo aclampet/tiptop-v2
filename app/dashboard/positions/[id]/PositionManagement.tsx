@@ -92,25 +92,30 @@ export default function PositionManagement({
     setMessage(null)
 
     try {
+      console.log('Deleting position:', positionId)
       const res = await fetch(`/api/positions/${positionId}`, {
         method: 'DELETE',
+        credentials: 'include',
       })
 
       const text = await res.text()
+      console.log('Delete response:', res.status, text)
+      
       let data
       try {
         data = JSON.parse(text)
       } catch {
-        throw new Error(`Server returned: ${text.slice(0, 200)}`)
+        throw new Error(`Server returned invalid response: ${text.slice(0, 200)}`)
       }
 
       if (!res.ok) {
-        throw new Error(data.error || `Delete failed (${res.status})`)
+        throw new Error(data.error || `Delete failed with status ${res.status}`)
       }
 
       // Navigate away after successful delete
       window.location.href = '/dashboard/positions'
     } catch (err: any) {
+      console.error('Delete error:', err)
       setMessage({ type: 'error', text: err.message })
       setLoading(false)
     }
