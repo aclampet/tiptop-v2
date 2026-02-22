@@ -77,22 +77,44 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // Create worker
-  const { data: worker, error: createError } = await admin
-    .from('workers')
-    .insert({
-      auth_user_id: user.id,
-      display_name,
-      slug,
-      is_public: true,
-    })
-    .select()
-    .single()
+  // Try to create worker, with slug uniqueness handling
+  let finalSlug = slug
+  let attempts = 0
+  let worker = null
+  let createError = null
 
-  if (createError) {
+  while (attempts < 5) {
+    const { data, error } = await admin
+      .from('workers')
+      .insert({
+        auth_user_id: user.id,
+        display_name,
+        slug: finalSlug,
+        is_public: true,
+      })
+      .select()
+      .single()
+
+    if (!error) {
+      worker = data
+      break
+    }
+
+    // If slug conflict, try with random suffix
+    if (error.code === '23505' && error.message?.includes('slug')) {
+      const randomSuffix = Math.random().toString(36).substring(2, 6)
+      finalSlug = `${slug}-${randomSuffix}`
+      attempts++
+    } else {
+      createError = error
+      break
+    }
+  }
+
+  if (createError || !worker) {
     console.error('Error creating worker:', createError)
     return NextResponse.json(
-      { error: 'Failed to create worker profile' },
+      { error: `Failed to create worker profile: ${createError?.message || 'Unknown error'}` },
       { status: 500 }
     )
   }
