@@ -57,12 +57,12 @@ export default async function AdminCompaniesPage({
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Companies</h1>
-          <p className="text-ink-400">Manage and verify companies</p>
+          <h1 className="text-3xl font-bold text-navy-600 mb-2">Companies</h1>
+          <p className="text-soft-500">Manage and verify companies</p>
         </div>
         <Link
           href="/admin/companies/new"
-          className="bg-brand-600 hover:bg-brand-500 text-white px-6 py-3 rounded-lg font-semibold transition-all"
+          className="bg-navy-600 hover:bg-navy-500 text-navy-600 px-6 py-3 rounded-lg font-semibold transition-all"
         >
           + Add Verified Company
         </Link>
@@ -78,35 +78,35 @@ export default async function AdminCompaniesPage({
 
       {/* Companies List */}
       {companiesWithStats.length > 0 ? (
-        <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+        <div className="bg-white border border-soft-200 rounded-xl overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/10">
-                <th className="text-left px-6 py-4 text-sm font-semibold text-ink-300">Company</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-ink-300">Location</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-ink-300">Status</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-ink-300">Stats</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-ink-300">Domain</th>
-                <th className="text-right px-6 py-4 text-sm font-semibold text-ink-300">Actions</th>
+              <tr className="border-b border-soft-200">
+                <th className="text-left px-6 py-4 text-sm font-semibold text-soft-500">Company</th>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-soft-500">Location</th>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-soft-500">Status</th>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-soft-500">Stats</th>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-soft-500">Domain</th>
+                <th className="text-right px-6 py-4 text-sm font-semibold text-soft-500">Actions</th>
               </tr>
             </thead>
             <tbody>
               {companiesWithStats.map((company) => (
-                <tr key={company.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
+                <tr key={company.id} className="border-b border-soft-200 hover:bg-white transition-colors">
                   <td className="px-6 py-4">
                     <div>
-                      <p className="text-white font-medium">{company.name}</p>
+                      <p className="text-navy-600 font-medium">{company.name}</p>
                       {company.industry && (
-                        <p className="text-xs text-ink-500">{company.industry}</p>
+                        <p className="text-xs text-soft-400">{company.industry}</p>
                       )}
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-ink-300">
+                    <div className="text-sm text-soft-500">
                       {company.city && company.state ? (
                         <>{company.city}, {company.state}</>
                       ) : (
-                        <span className="text-ink-600">—</span>
+                        <span className="text-soft-400">—</span>
                       )}
                     </div>
                   </td>
@@ -114,9 +114,9 @@ export default async function AdminCompaniesPage({
                     <StatusBadge status={company.verification_status} />
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-ink-300 space-y-1">
+                    <div className="text-sm text-soft-500 space-y-1">
                       <div>{company.position_count} positions</div>
-                      <div className="flex items-center gap-2 text-xs text-ink-500">
+                      <div className="flex items-center gap-2 text-xs text-soft-400">
                         <span>⭐ {company.average_rating > 0 ? company.average_rating.toFixed(1) : '—'}</span>
                         <span>•</span>
                         <span>{company.review_count} reviews</span>
@@ -125,17 +125,17 @@ export default async function AdminCompaniesPage({
                   </td>
                   <td className="px-6 py-4">
                     {company.email_domain ? (
-                      <code className="text-xs text-brand-400 bg-brand-500/10 px-2 py-1 rounded">
+                      <code className="text-xs text-navy-500 bg-navy-500/10 px-2 py-1 rounded">
                         {company.email_domain}
                       </code>
                     ) : (
-                      <span className="text-xs text-ink-600">No domain</span>
+                      <span className="text-xs text-soft-400">No domain</span>
                     )}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <Link
                       href={`/admin/companies/${company.id}`}
-                      className="text-sm text-brand-400 hover:text-brand-300 transition-colors"
+                      className="text-sm text-navy-500 hover:text-navy-400 transition-colors"
                     >
                       Edit →
                     </Link>
@@ -146,9 +146,9 @@ export default async function AdminCompaniesPage({
           </table>
         </div>
       ) : (
-        <div className="text-center py-20 bg-white/5 border border-white/10 rounded-xl">
+        <div className="text-center py-20 bg-white border border-soft-200 rounded-xl">
           <div className="text-6xl mb-6">🏢</div>
-          <p className="text-ink-400">No companies found</p>
+          <p className="text-soft-500">No companies found</p>
         </div>
       )}
 
@@ -161,8 +161,8 @@ export default async function AdminCompaniesPage({
               href={`/admin/companies?status=${status}&page=${p}`}
               className={`px-4 py-2 rounded-lg transition-colors ${
                 p === page
-                  ? 'bg-brand-600 text-white'
-                  : 'bg-white/5 text-ink-300 hover:bg-white/10'
+                  ? 'bg-navy-600 text-navy-600'
+                  : 'bg-white text-soft-500 hover:bg-soft-100'
               }`}
             >
               {p}
@@ -180,8 +180,8 @@ function FilterTab({ href, label, active }: { href: string; label: string; activ
       href={href}
       className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
         active
-          ? 'bg-brand-600 text-white'
-          : 'bg-white/5 text-ink-300 hover:bg-white/10'
+          ? 'bg-navy-600 text-navy-600'
+          : 'bg-white text-soft-500 hover:bg-soft-100'
       }`}
     >
       {label}

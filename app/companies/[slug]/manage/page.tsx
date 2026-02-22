@@ -99,20 +99,20 @@ export default function ManageCompanyPage({ params }: { params: { slug: string }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-ink-950 flex items-center justify-center">
-        <p className="text-ink-400">Loading...</p>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <p className="text-soft-500">Loading...</p>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-ink-950 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="max-w-md text-center">
           <div className="text-6xl mb-6">🔒</div>
-          <h1 className="text-2xl font-bold text-white mb-4">Access Denied</h1>
-          <p className="text-ink-400 mb-8">{error}</p>
-          <Link href="/dashboard" className="text-brand-400 hover:text-brand-300">
+          <h1 className="text-2xl font-bold text-navy-600 mb-4">Access Denied</h1>
+          <p className="text-soft-500 mb-8">{error}</p>
+          <Link href="/dashboard" className="text-navy-500 hover:text-navy-400">
             Back to Dashboard →
           </Link>
         </div>
@@ -121,19 +121,19 @@ export default function ManageCompanyPage({ params }: { params: { slug: string }
   }
 
   return (
-    <div className="min-h-screen bg-ink-950">
+    <div className="min-h-screen bg-white">
       <div className="max-w-2xl mx-auto p-8">
         {/* Header */}
-        <div className="flex items-center gap-2 text-sm text-ink-400 mb-6">
-          <Link href={`/companies/${params.slug}`} className="hover:text-white transition-colors">
+        <div className="flex items-center gap-2 text-sm text-soft-500 mb-6">
+          <Link href={`/companies/${params.slug}`} className="hover:text-navy-600 transition-colors">
             {company.name}
           </Link>
           <span>/</span>
-          <span className="text-white">Manage</span>
+          <span className="text-navy-600">Manage</span>
         </div>
 
-        <h1 className="text-3xl font-bold text-white mb-2">Manage Company Profile</h1>
-        <p className="text-ink-400 mb-8">
+        <h1 className="text-3xl font-bold text-navy-600 mb-2">Manage Company Profile</h1>
+        <p className="text-soft-500 mb-8">
           Update your company&apos;s public profile on TipTop
         </p>
 
@@ -162,89 +162,89 @@ export default function ManageCompanyPage({ params }: { params: { slug: string }
 
         <form onSubmit={handleSave} className="space-y-6">
           {/* Basic Info */}
-          <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-            <h2 className="text-xl font-semibold text-white mb-6">Company Details</h2>
+          <div className="bg-white border border-soft-200 rounded-xl p-6">
+            <h2 className="text-xl font-semibold text-navy-600 mb-6">Company Details</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-ink-300 mb-2">Company Name</label>
+                <label className="block text-sm font-medium text-soft-500 mb-2">Company Name</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-ink-300 mb-2">Industry</label>
+                <label className="block text-sm font-medium text-soft-500 mb-2">Industry</label>
                 <input
                   type="text"
                   value={industry}
                   onChange={(e) => setIndustry(e.target.value)}
                   placeholder="IT Consulting, Restaurant, etc."
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-ink-300 mb-2">Website</label>
+                <label className="block text-sm font-medium text-soft-500 mb-2">Website</label>
                 <input
                   type="url"
                   value={website}
                   onChange={(e) => setWebsite(e.target.value)}
                   placeholder="https://avdv.com"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
                 />
               </div>
             </div>
           </div>
 
           {/* Location */}
-          <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-            <h2 className="text-xl font-semibold text-white mb-6">Location</h2>
+          <div className="bg-white border border-soft-200 rounded-xl p-6">
+            <h2 className="text-xl font-semibold text-navy-600 mb-6">Location</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-ink-300 mb-2">Address</label>
+                <label className="block text-sm font-medium text-soft-500 mb-2">Address</label>
                 <input
                   type="text"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="123 Main Street"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
                 />
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-1">
-                  <label className="block text-sm font-medium text-ink-300 mb-2">City</label>
+                  <label className="block text-sm font-medium text-soft-500 mb-2">City</label>
                   <input
                     type="text"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     placeholder="Bellefonte"
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-ink-300 mb-2">State</label>
+                  <label className="block text-sm font-medium text-soft-500 mb-2">State</label>
                   <input
                     type="text"
                     value={state}
                     onChange={(e) => setState(e.target.value)}
                     maxLength={2}
                     placeholder="PA"
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-ink-300 mb-2">ZIP</label>
+                  <label className="block text-sm font-medium text-soft-500 mb-2">ZIP</label>
                   <input
                     type="text"
                     value={zip}
                     onChange={(e) => setZip(e.target.value)}
                     maxLength={10}
                     placeholder="16823"
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
                   />
                 </div>
               </div>
@@ -252,18 +252,18 @@ export default function ManageCompanyPage({ params }: { params: { slug: string }
           </div>
 
           {/* HR Contact */}
-          <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-            <h2 className="text-xl font-semibold text-white mb-6">HR / Verification Contact</h2>
+          <div className="bg-white border border-soft-200 rounded-xl p-6">
+            <h2 className="text-xl font-semibold text-navy-600 mb-6">HR / Verification Contact</h2>
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">HR Email</label>
+              <label className="block text-sm font-medium text-soft-500 mb-2">HR Email</label>
               <input
                 type="email"
                 value={hrEmail}
                 onChange={(e) => setHrEmail(e.target.value)}
                 placeholder="hr@company.com"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
               />
-              <p className="text-xs text-ink-500 mt-1">
+              <p className="text-xs text-soft-400 mt-1">
                 This email receives employment verification requests from workers
               </p>
             </div>
@@ -274,13 +274,13 @@ export default function ManageCompanyPage({ params }: { params: { slug: string }
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white py-4 rounded-xl font-semibold transition-all"
+              className="flex-1 bg-navy-600 hover:bg-navy-500 disabled:opacity-50 text-white py-4 rounded-xl font-semibold transition-all"
             >
               {saving ? 'Saving...' : 'Save Changes'}
             </button>
             <Link
               href={`/companies/${params.slug}`}
-              className="flex-1 bg-white/5 hover:bg-white/10 text-white py-4 rounded-xl font-semibold transition-all text-center"
+              className="flex-1 bg-white hover:bg-soft-100 text-navy-600 py-4 rounded-xl font-semibold transition-all text-center"
             >
               View Public Profile
             </Link>

@@ -72,26 +72,26 @@ export default async function CompanyProfilePage({ params }: { params: { slug: s
   )
 
   return (
-    <div className="min-h-screen bg-ink-950">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-gradient-to-b from-brand-600/10 to-transparent border-b border-white/10">
+      <div className="bg-gradient-to-b from-navy-600/5 to-transparent border-b border-soft-200">
         <div className="max-w-4xl mx-auto px-6 py-12">
           <div className="flex items-start gap-6">
             {company.logo_url ? (
               <img
                 src={company.logo_url}
                 alt={company.name}
-                className="w-24 h-24 rounded-xl border-4 border-white/10 bg-white object-contain"
+                className="w-24 h-24 rounded-xl border-4 border-soft-200 bg-white object-contain"
               />
             ) : (
-              <div className="w-24 h-24 rounded-xl bg-brand-600/20 border-4 border-white/10 flex items-center justify-center text-4xl">
+              <div className="w-24 h-24 rounded-xl bg-navy-600/20 border-4 border-soft-200 flex items-center justify-center text-4xl">
                 🏢
               </div>
             )}
             
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-4xl font-bold text-white">
+                <h1 className="text-4xl font-bold text-navy-600">
                   {company.name}
                 </h1>
                 {company.verification_status === 'verified' && (
@@ -101,7 +101,7 @@ export default async function CompanyProfilePage({ params }: { params: { slug: s
                 )}
               </div>
 
-              <div className="flex items-center gap-4 text-ink-400 mb-4">
+              <div className="flex items-center gap-4 text-soft-500 mb-4">
                 {company.city && company.state && (
                   <div className="flex items-center gap-1">
                     <span>📍</span>
@@ -121,7 +121,7 @@ export default async function CompanyProfilePage({ params }: { params: { slug: s
                   href={company.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-brand-400 hover:text-brand-300 text-sm transition-colors"
+                  className="text-navy-500 hover:text-navy-400 text-sm transition-colors"
                 >
                   {company.website} →
                 </a>
@@ -158,7 +158,7 @@ export default async function CompanyProfilePage({ params }: { params: { slug: s
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Employees */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-6">
+          <h2 className="text-2xl font-bold text-navy-600 mb-6">
             Employees & Former Employees
           </h2>
           
@@ -172,30 +172,30 @@ export default async function CompanyProfilePage({ params }: { params: { slug: s
               })}
             </div>
           ) : (
-            <div className="text-center py-12 bg-white/5 border border-white/10 rounded-xl">
-              <p className="text-ink-500">No employees have added positions yet</p>
+            <div className="text-center py-12 bg-white border border-soft-200 rounded-xl">
+              <p className="text-soft-400">No employees have added positions yet</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Footer */}
-      <div className="border-t border-white/10 bg-white/5">
+      <div className="border-t border-soft-200 bg-white">
         <div className="max-w-4xl mx-auto px-6 py-8 text-center">
           <div className="flex items-center justify-center gap-6 mb-4">
             <a
               href={`/companies/${params.slug}/manage`}
-              className="text-brand-400 hover:text-brand-300 text-sm transition-colors"
+              className="text-navy-500 hover:text-navy-400 text-sm transition-colors"
             >
               Manage this company →
             </a>
           </div>
-          <p className="text-ink-500 text-sm mb-2">
+          <p className="text-soft-400 text-sm mb-2">
             Company profiles on TipTop.review showcase verified employee work history and reviews
           </p>
           <a
             href="https://tiptop.review"
-            className="text-brand-600 hover:text-brand-400 transition-colors font-medium"
+            className="text-navy-600 hover:text-navy-500 transition-colors font-medium"
           >
             TipTop.review
           </a>
@@ -207,10 +207,10 @@ export default async function CompanyProfilePage({ params }: { params: { slug: s
 
 function StatCard({ icon, value, label }: { icon: string; value: string; label: string }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+    <div className="bg-white border border-soft-200 rounded-xl p-4 text-center">
       <div className="text-3xl mb-2">{icon}</div>
-      <div className="text-2xl font-bold text-white mb-1">{value}</div>
-      <div className="text-xs text-ink-400">{label}</div>
+      <div className="text-2xl font-bold text-navy-600 mb-1">{value}</div>
+      <div className="text-xs text-soft-500">{label}</div>
     </div>
   )
 }
@@ -222,23 +222,23 @@ function WorkerCard({ worker, positions }: { worker: any; positions: any[] }) {
   return (
     <Link
       href={`/worker/${worker.slug}`}
-      className="block bg-white/5 border border-white/10 hover:border-brand-500/50 rounded-xl p-6 transition-all"
+      className="block bg-white border border-soft-200 hover:border-gold-300 rounded-xl p-6 transition-all"
     >
-      <h3 className="text-lg font-semibold text-white mb-2">
+      <h3 className="text-lg font-semibold text-navy-600 mb-2">
         {worker.display_name}
       </h3>
       
       {currentPosition ? (
-        <p className="text-brand-400 text-sm mb-3">
+        <p className="text-navy-500 text-sm mb-3">
           {currentPosition.title}
         </p>
       ) : (
-        <p className="text-ink-500 text-sm mb-3">
+        <p className="text-soft-400 text-sm mb-3">
           Former Employee
         </p>
       )}
 
-      <div className="flex items-center gap-4 text-sm text-ink-400 mb-3">
+      <div className="flex items-center gap-4 text-sm text-soft-500 mb-3">
         <div className="flex items-center gap-1">
           <span>⭐</span>
           <span>{worker.overall_rating > 0 ? formatRating(worker.overall_rating) : '—'}</span>
@@ -249,7 +249,7 @@ function WorkerCard({ worker, positions }: { worker: any; positions: any[] }) {
         </div>
       </div>
 
-      <div className="text-xs text-ink-500">
+      <div className="text-xs text-soft-400">
         {positionCount} {positionCount === 1 ? 'position' : 'positions'} at this company
       </div>
     </Link>

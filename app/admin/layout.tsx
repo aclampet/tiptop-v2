@@ -39,26 +39,26 @@ export default async function AdminLayout({
   ]
 
   return (
-    <div className="min-h-screen bg-ink-950 flex">
+    <div className="min-h-screen bg-white flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-white/5 border-r border-white/10 flex flex-col">
+      <aside className="w-64 bg-white border-r border-soft-200 flex flex-col">
         <div className="p-6">
           <Link href="/">
             <span 
               style={{ fontFamily: 'var(--font-display)' }}
-              className="text-2xl text-brand-400 hover:text-brand-300 transition-colors"
+              className="text-2xl text-navy-500 hover:text-navy-400 transition-colors"
             >
               TipTop
             </span>
           </Link>
-          <p className="text-xs text-ink-500 mt-1">Admin Panel</p>
+          <p className="text-xs text-soft-400 mt-1">Admin Panel</p>
         </div>
 
         {/* Admin Badge */}
-        <div className="px-6 py-4 border-y border-white/10">
-          <div className="bg-brand-500/10 border border-brand-500/20 rounded-lg px-3 py-2">
-            <p className="text-brand-400 text-sm font-semibold">👑 Admin</p>
-            <p className="text-ink-500 text-xs">{user.email}</p>
+        <div className="px-6 py-4 border-y border-soft-200">
+          <div className="bg-navy-500/10 border border-gold-300/20 rounded-lg px-3 py-2">
+            <p className="text-navy-500 text-sm font-semibold">👑 Admin</p>
+            <p className="text-soft-400 text-xs">{user.email}</p>
           </div>
         </div>
 
@@ -69,7 +69,7 @@ export default async function AdminLayout({
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-ink-300 hover:bg-white/5 hover:text-white transition-all"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-soft-500 hover:bg-white hover:text-navy-600 transition-all"
                 >
                   <span className="text-xl">{item.icon}</span>
                   <span>{item.label}</span>
@@ -80,10 +80,10 @@ export default async function AdminLayout({
         </nav>
 
         {/* Back to Dashboard */}
-        <div className="p-4 border-t border-white/10">
+        <div className="p-4 border-t border-soft-200">
           <Link
             href="/dashboard"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-ink-300 hover:bg-white/5 hover:text-white transition-all"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-soft-500 hover:bg-white hover:text-navy-600 transition-all"
           >
             <span className="text-xl">←</span>
             <span>Back to Dashboard</span>

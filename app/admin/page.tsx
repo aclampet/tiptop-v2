@@ -51,8 +51,8 @@ export default async function AdminDashboardPage() {
     <div className="p-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Admin Dashboard</h1>
-        <p className="text-ink-400">System overview and management</p>
+        <h1 className="text-3xl font-bold text-navy-600 mb-2">Admin Dashboard</h1>
+        <p className="text-soft-500">System overview and management</p>
       </div>
 
       {/* Alert: Pending Verifications */}
@@ -61,15 +61,15 @@ export default async function AdminDashboardPage() {
           <div className="flex items-start gap-4">
             <div className="text-4xl">⚠️</div>
             <div className="flex-1">
-              <h2 className="text-xl font-semibold text-white mb-2">
+              <h2 className="text-xl font-semibold text-navy-600 mb-2">
                 {pendingVerifications.length} Pending Verification{pendingVerifications.length !== 1 ? 's' : ''}
               </h2>
-              <p className="text-ink-300 mb-4">
+              <p className="text-soft-500 mb-4">
                 Companies waiting for verification review
               </p>
               <Link
                 href="/admin/verifications"
-                className="inline-block bg-yellow-600 hover:bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold transition-all"
+                className="inline-block bg-yellow-600 hover:bg-yellow-500 text-navy-600 px-6 py-3 rounded-lg font-semibold transition-all"
               >
                 Review Requests
               </Link>
@@ -116,8 +116,8 @@ export default async function AdminDashboardPage() {
             <div className="text-3xl">✅</div>
             <span className="text-xs text-green-400 font-medium">VERIFIED</span>
           </div>
-          <div className="text-3xl font-bold text-white mb-1">{verifiedCompanies}</div>
-          <div className="text-sm text-ink-400">Verified Companies</div>
+          <div className="text-3xl font-bold text-navy-600 mb-1">{verifiedCompanies}</div>
+          <div className="text-sm text-soft-500">Verified Companies</div>
         </div>
 
         <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
@@ -125,8 +125,8 @@ export default async function AdminDashboardPage() {
             <div className="text-3xl">📋</div>
             <span className="text-xs text-blue-400 font-medium">REGISTERED</span>
           </div>
-          <div className="text-3xl font-bold text-white mb-1">{registeredCompanies}</div>
-          <div className="text-sm text-ink-400">Registered Companies</div>
+          <div className="text-3xl font-bold text-navy-600 mb-1">{registeredCompanies}</div>
+          <div className="text-sm text-soft-500">Registered Companies</div>
         </div>
 
         <div className="bg-gray-500/10 border border-gray-500/20 rounded-xl p-6">
@@ -134,8 +134,8 @@ export default async function AdminDashboardPage() {
             <div className="text-3xl">⚪</div>
             <span className="text-xs text-gray-400 font-medium">UNVERIFIED</span>
           </div>
-          <div className="text-3xl font-bold text-white mb-1">{unverifiedCompanies}</div>
-          <div className="text-sm text-ink-400">Unverified Companies</div>
+          <div className="text-3xl font-bold text-navy-600 mb-1">{unverifiedCompanies}</div>
+          <div className="text-sm text-soft-500">Unverified Companies</div>
         </div>
       </div>
 
@@ -143,24 +143,24 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Recent Reviews */}
         <div>
-          <h2 className="text-xl font-semibold text-white mb-4">Recent Reviews</h2>
+          <h2 className="text-xl font-semibold text-navy-600 mb-4">Recent Reviews</h2>
           <div className="space-y-3">
             {recentReviews?.map((review) => (
-              <div key={review.id} className="bg-white/5 border border-white/10 rounded-lg p-4">
+              <div key={review.id} className="bg-white border border-soft-200 rounded-lg p-4">
                 <div className="flex items-start justify-between mb-2">
                   <div className="text-lg">{'⭐'.repeat(review.rating)}</div>
-                  <span className="text-xs text-ink-500">
+                  <span className="text-xs text-soft-400">
                     {new Date(review.created_at).toLocaleDateString()}
                   </span>
                 </div>
-                <p className="text-sm text-white font-medium mb-1">
+                <p className="text-sm text-navy-600 font-medium mb-1">
                   {review.position?.worker?.display_name}
                 </p>
-                <p className="text-xs text-ink-400">
+                <p className="text-xs text-soft-500">
                   {review.position?.title} at {review.position?.company?.name}
                 </p>
                 {review.comment && (
-                  <p className="text-xs text-ink-500 mt-2 italic line-clamp-2">
+                  <p className="text-xs text-soft-400 mt-2 italic line-clamp-2">
                     "{review.comment}"
                   </p>
                 )}
@@ -171,27 +171,27 @@ export default async function AdminDashboardPage() {
 
         {/* Recent Workers */}
         <div>
-          <h2 className="text-xl font-semibold text-white mb-4">Recent Signups</h2>
+          <h2 className="text-xl font-semibold text-navy-600 mb-4">Recent Signups</h2>
           <div className="space-y-3">
             {recentWorkers?.map((worker) => (
-              <div key={worker.id} className="bg-white/5 border border-white/10 rounded-lg p-4">
+              <div key={worker.id} className="bg-white border border-soft-200 rounded-lg p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <p className="text-sm text-white font-medium mb-1">
+                    <p className="text-sm text-navy-600 font-medium mb-1">
                       {worker.display_name}
                     </p>
-                    <div className="flex items-center gap-3 text-xs text-ink-400">
+                    <div className="flex items-center gap-3 text-xs text-soft-500">
                       <span>⭐ {worker.overall_rating > 0 ? worker.overall_rating.toFixed(1) : '—'}</span>
                       <span>💬 {worker.total_reviews} reviews</span>
                     </div>
                   </div>
-                  <span className="text-xs text-ink-500">
+                  <span className="text-xs text-soft-400">
                     {new Date(worker.created_at).toLocaleDateString()}
                   </span>
                 </div>
                 <Link
                   href={`/worker/${worker.slug}`}
-                  className="text-xs text-brand-400 hover:text-brand-300 mt-2 inline-block"
+                  className="text-xs text-navy-500 hover:text-navy-400 mt-2 inline-block"
                 >
                   View profile →
                 </Link>
@@ -218,11 +218,11 @@ function StatCard({
   href?: string
 }) {
   const content = (
-    <div className="bg-white/5 border border-white/10 rounded-xl p-6 h-full">
+    <div className="bg-white border border-soft-200 rounded-xl p-6 h-full">
       <div className="text-3xl mb-2">{icon}</div>
-      <div className="text-3xl font-bold text-white mb-1">{value}</div>
-      <div className="text-sm text-ink-400 mb-1">{label}</div>
-      <div className="text-xs text-ink-500">{subtext}</div>
+      <div className="text-3xl font-bold text-navy-600 mb-1">{value}</div>
+      <div className="text-sm text-soft-500 mb-1">{label}</div>
+      <div className="text-xs text-soft-400">{subtext}</div>
     </div>
   )
 

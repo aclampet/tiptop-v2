@@ -61,29 +61,29 @@ export default async function WorkerProfilePage({ params }: { params: { slug: st
   const pastPositions = sortedPositions.filter((p: any) => p.end_date)
 
   return (
-    <div className="min-h-screen bg-ink-950">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-gradient-to-b from-brand-600/10 to-transparent border-b border-white/10">
+      <div className="bg-gradient-to-b from-navy-600/5 to-transparent border-b border-soft-200">
         <div className="max-w-4xl mx-auto px-6 py-12">
           <div className="flex items-start gap-6">
             {worker.avatar_url ? (
               <img
                 src={worker.avatar_url}
                 alt={worker.display_name}
-                className="w-24 h-24 rounded-full border-4 border-white/10"
+                className="w-24 h-24 rounded-full border-4 border-soft-200"
               />
             ) : (
-              <div className="w-24 h-24 rounded-full bg-brand-600/20 border-4 border-white/10 flex items-center justify-center text-4xl">
+              <div className="w-24 h-24 rounded-full bg-navy-600/20 border-4 border-soft-200 flex items-center justify-center text-4xl">
                 👤
               </div>
             )}
             
             <div className="flex-1">
-              <h1 className="text-4xl font-bold text-white mb-2">
+              <h1 className="text-4xl font-bold text-navy-600 mb-2">
                 {worker.display_name}
               </h1>
               {worker.bio && (
-                <p className="text-ink-300 mb-4">{worker.bio}</p>
+                <p className="text-soft-500 mb-4">{worker.bio}</p>
               )}
               
               {/* Overall Stats */}
@@ -91,27 +91,27 @@ export default async function WorkerProfilePage({ params }: { params: { slug: st
                 <div className="flex items-center gap-2">
                   <span className="text-3xl">⭐</span>
                   <div>
-                    <div className="text-2xl font-bold text-white">
+                    <div className="text-2xl font-bold text-navy-600">
                       {worker.overall_rating > 0 ? formatRating(worker.overall_rating) : '—'}
                     </div>
-                    <div className="text-xs text-ink-500">Overall Rating</div>
+                    <div className="text-xs text-soft-400">Overall Rating</div>
                   </div>
                 </div>
                 
-                <div className="border-l border-white/10 pl-6">
-                  <div className="text-2xl font-bold text-white">
+                <div className="border-l border-soft-200 pl-6">
+                  <div className="text-2xl font-bold text-navy-600">
                     {worker.total_reviews}
                   </div>
-                  <div className="text-xs text-ink-500">
+                  <div className="text-xs text-soft-400">
                     Total Reviews
                   </div>
                 </div>
 
-                <div className="border-l border-white/10 pl-6">
-                  <div className="text-2xl font-bold text-white">
+                <div className="border-l border-soft-200 pl-6">
+                  <div className="text-2xl font-bold text-navy-600">
                     {worker.positions.length}
                   </div>
-                  <div className="text-xs text-ink-500">
+                  <div className="text-xs text-soft-400">
                     Positions
                   </div>
                 </div>
@@ -125,7 +125,7 @@ export default async function WorkerProfilePage({ params }: { params: { slug: st
         {/* Current Positions */}
         {activePositions.length > 0 && (
           <div className="mb-12">
-            <h2 className="text-2xl font-bold text-white mb-6">Current Positions</h2>
+            <h2 className="text-2xl font-bold text-navy-600 mb-6">Current Positions</h2>
             <div className="space-y-6">
               {activePositions.map((position: any) => (
                 <PositionCard key={position.id} position={position} />
@@ -137,7 +137,7 @@ export default async function WorkerProfilePage({ params }: { params: { slug: st
         {/* Past Positions */}
         {pastPositions.length > 0 && (
           <div>
-            <h2 className="text-2xl font-bold text-white mb-6">Experience</h2>
+            <h2 className="text-2xl font-bold text-navy-600 mb-6">Experience</h2>
             <div className="space-y-6">
               {pastPositions.map((position: any) => (
                 <PositionCard key={position.id} position={position} />
@@ -148,9 +148,9 @@ export default async function WorkerProfilePage({ params }: { params: { slug: st
 
         {/* No Positions */}
         {worker.positions.length === 0 && (
-          <div className="text-center py-20 bg-white/5 border border-white/10 rounded-xl">
+          <div className="text-center py-20 bg-white border border-soft-200 rounded-xl">
             <div className="text-6xl mb-6">💼</div>
-            <p className="text-ink-400">
+            <p className="text-soft-500">
               {worker.display_name} hasn't added any positions yet.
             </p>
           </div>
@@ -158,14 +158,14 @@ export default async function WorkerProfilePage({ params }: { params: { slug: st
       </div>
 
       {/* Footer */}
-      <div className="border-t border-white/10 bg-white/5">
+      <div className="border-t border-soft-200 bg-white">
         <div className="max-w-4xl mx-auto px-6 py-8 text-center">
-          <p className="text-ink-500 text-sm mb-2">
+          <p className="text-soft-400 text-sm mb-2">
             This is a verified TipTop.review professional profile
           </p>
           <a
             href="https://tiptop.review"
-            className="text-brand-600 hover:text-brand-400 transition-colors font-medium"
+            className="text-navy-600 hover:text-navy-500 transition-colors font-medium"
           >
             TipTop.review
           </a>
@@ -185,27 +185,27 @@ function PositionCard({ position }: { position: any }) {
     .slice(0, 3)
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+    <div className="bg-white border border-soft-200 rounded-xl p-6">
       {/* Position Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <h3 className="text-2xl font-semibold text-white mb-2">
+          <h3 className="text-2xl font-semibold text-navy-600 mb-2">
             {position.title}
           </h3>
           <div className="flex items-center gap-2 mb-2">
-            <p className="text-lg text-brand-400">
+            <p className="text-lg text-navy-500">
               {position.company.name}
             </p>
             {position.company.verification_status === 'verified' && (
-              <span className="text-brand-400">✓</span>
+              <span className="text-navy-500">✓</span>
             )}
           </div>
           {position.company.city && position.company.state && (
-            <p className="text-sm text-ink-500 mb-3">
+            <p className="text-sm text-soft-400 mb-3">
               {position.company.city}, {position.company.state}
             </p>
           )}
-          <div className="flex items-center gap-4 text-sm text-ink-400">
+          <div className="flex items-center gap-4 text-sm text-soft-500">
             <span>{dateRange}</span>
             <span>•</span>
             <span>{duration}</span>
@@ -220,22 +220,22 @@ function PositionCard({ position }: { position: any }) {
       </div>
 
       {/* Position Stats */}
-      <div className="flex items-center gap-6 py-4 border-y border-white/10 my-4">
+      <div className="flex items-center gap-6 py-4 border-y border-soft-200 my-4">
         <div className="flex items-center gap-2">
           <span className="text-2xl">⭐</span>
           <div>
-            <div className="text-xl font-bold text-white">
+            <div className="text-xl font-bold text-navy-600">
               {position.rating > 0 ? formatRating(position.rating) : '—'}
             </div>
-            <div className="text-xs text-ink-500">Rating</div>
+            <div className="text-xs text-soft-400">Rating</div>
           </div>
         </div>
         
-        <div className="border-l border-white/10 pl-6">
-          <div className="text-xl font-bold text-white">
+        <div className="border-l border-soft-200 pl-6">
+          <div className="text-xl font-bold text-navy-600">
             {position.review_count}
           </div>
-          <div className="text-xs text-ink-500">
+          <div className="text-xs text-soft-400">
             Reviews
           </div>
         </div>
@@ -244,23 +244,23 @@ function PositionCard({ position }: { position: any }) {
       {/* Recent Reviews */}
       {recentReviews.length > 0 && (
         <div>
-          <h4 className="text-sm font-semibold text-white mb-3">Recent Reviews</h4>
+          <h4 className="text-sm font-semibold text-navy-600 mb-3">Recent Reviews</h4>
           <div className="space-y-3">
             {recentReviews.map((review: any) => (
               <div
                 key={review.id}
-                className="bg-white/5 rounded-lg p-4"
+                className="bg-white rounded-lg p-4"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <div className="text-sm">{'⭐'.repeat(review.rating)}</div>
                   {review.reviewer_name && (
-                    <span className="text-xs text-ink-400">
+                    <span className="text-xs text-soft-500">
                       — {review.reviewer_name}
                     </span>
                   )}
                 </div>
                 {review.comment && (
-                  <p className="text-sm text-ink-300 italic">
+                  <p className="text-sm text-soft-500 italic">
                     "{review.comment}"
                   </p>
                 )}
@@ -269,7 +269,7 @@ function PositionCard({ position }: { position: any }) {
           </div>
           
           {position.review_count > 3 && (
-            <p className="text-xs text-ink-500 mt-3">
+            <p className="text-xs text-soft-400 mt-3">
               + {position.review_count - 3} more reviews
             </p>
           )}
@@ -278,7 +278,7 @@ function PositionCard({ position }: { position: any }) {
 
       {/* No Reviews */}
       {position.review_count === 0 && (
-        <p className="text-sm text-ink-500 italic">
+        <p className="text-sm text-soft-400 italic">
           No reviews yet for this position
         </p>
       )}

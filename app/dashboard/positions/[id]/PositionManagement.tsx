@@ -134,7 +134,7 @@ export default function PositionManagement({
           <button
             onClick={() => setShowEdit(true)}
             disabled={loading}
-            className="bg-white/10 hover:bg-white/15 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+            className="bg-soft-100 hover:bg-soft-200 text-navy-600 px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
           >
             ✏️ Edit Position
           </button>
@@ -142,7 +142,7 @@ export default function PositionManagement({
           <button
             onClick={handleToggleVisibility}
             disabled={loading}
-            className="bg-white/10 hover:bg-white/15 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+            className="bg-soft-100 hover:bg-soft-200 text-navy-600 px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
           >
             {loading ? 'Updating...' : isActive ? '👁️‍🗨️ Hide Position' : '👁️ Show Position'}
           </button>
@@ -150,7 +150,7 @@ export default function PositionManagement({
           <button
             onClick={() => setShowDeleteConfirm(true)}
             disabled={loading}
-            className="bg-red-500/10 hover:bg-red-500/20 text-red-400 px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+            className="bg-red-500/10 hover:bg-red-500/20 text-red-500 px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
           >
             🗑️ Delete
           </button>
@@ -160,39 +160,39 @@ export default function PositionManagement({
       {/* Edit Form */}
       {showEdit && (
         <form onSubmit={handleUpdate} className="space-y-4">
-          <div className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-4">
-            <h3 className="text-white font-semibold text-sm">Edit Position</h3>
+          <div className="bg-white border border-soft-200 rounded-lg p-4 space-y-4">
+            <h3 className="text-navy-600 font-semibold text-sm">Edit Position</h3>
 
             <div>
-              <label className="block text-sm text-ink-400 mb-1">Job Title</label>
+              <label className="block text-sm text-soft-500 mb-1">Job Title</label>
               <input
                 type="text"
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
                 required
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-brand-500 transition-colors"
+                className="w-full bg-white border border-soft-200 rounded-lg px-4 py-2.5 text-navy-600 focus:outline-none focus:border-navy-500 transition-colors"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-ink-400 mb-1">Start Date</label>
+                <label className="block text-sm text-soft-500 mb-1">Start Date</label>
                 <input
                   type="date"
                   value={editStartDate}
                   onChange={(e) => setEditStartDate(e.target.value)}
                   required
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-brand-500 transition-colors"
+                  className="w-full bg-white border border-soft-200 rounded-lg px-4 py-2.5 text-navy-600 focus:outline-none focus:border-navy-500 transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-sm text-ink-400 mb-1">End Date</label>
+                <label className="block text-sm text-soft-500 mb-1">End Date</label>
                 <input
                   type="date"
                   value={editEndDate}
                   onChange={(e) => setEditEndDate(e.target.value)}
                   disabled={isCurrent}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white disabled:opacity-50 focus:outline-none focus:border-brand-500 transition-colors"
+                  className="w-full bg-white border border-soft-200 rounded-lg px-4 py-2.5 text-navy-600 disabled:opacity-50 focus:outline-none focus:border-navy-500 transition-colors"
                 />
               </div>
             </div>
@@ -204,7 +204,7 @@ export default function PositionManagement({
                 onChange={(e) => setIsCurrent(e.target.checked)}
                 className="w-4 h-4"
               />
-              <span className="text-sm text-ink-300">I currently work here</span>
+              <span className="text-sm text-soft-500">I currently work here</span>
             </label>
           </div>
 
@@ -212,14 +212,14 @@ export default function PositionManagement({
             <button
               type="submit"
               disabled={loading}
-              className="bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all"
+              className="bg-navy-600 hover:bg-navy-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all"
             >
               {loading ? 'Saving...' : 'Save Changes'}
             </button>
             <button
               type="button"
               onClick={() => { setShowEdit(false); setMessage(null) }}
-              className="bg-white/10 hover:bg-white/15 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all"
+              className="bg-soft-100 hover:bg-soft-200 text-navy-600 px-5 py-2.5 rounded-lg font-semibold text-sm transition-all"
             >
               Cancel
             </button>
@@ -231,7 +231,7 @@ export default function PositionManagement({
       {showDeleteConfirm && (
         <div className="bg-red-500/5 border border-red-500/20 rounded-lg p-4">
           <h3 className="text-red-400 font-semibold mb-2">Delete this position?</h3>
-          <p className="text-ink-300 text-sm mb-4">
+          <p className="text-soft-500 text-sm mb-4">
             {reviewCount > 0
               ? `This will permanently delete this position and all ${reviewCount} associated review${reviewCount !== 1 ? 's' : ''}. This cannot be undone.`
               : 'This will permanently delete this position and its QR code. This cannot be undone.'}
@@ -247,7 +247,7 @@ export default function PositionManagement({
             <button
               onClick={() => { setShowDeleteConfirm(false); setMessage(null) }}
               disabled={loading}
-              className="bg-white/10 hover:bg-white/15 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all"
+              className="bg-soft-100 hover:bg-soft-200 text-navy-600 px-5 py-2.5 rounded-lg font-semibold text-sm transition-all"
             >
               Cancel
             </button>

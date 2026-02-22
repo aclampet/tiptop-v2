@@ -6,14 +6,10 @@ export const metadata: Metadata = {
   description: 'Build your professional reputation once, carry it everywhere',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="font-body">{children}</body>
     </html>
   )
 }

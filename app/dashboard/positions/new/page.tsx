@@ -137,8 +137,8 @@ export default function NewPositionPage() {
   return (
     <div className="p-4 md:p-8">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-white mb-2">Add Position</h1>
-        <p className="text-ink-400 mb-8">Add a current or past job to build your portable reputation</p>
+        <h1 className="text-3xl font-bold text-navy-600 mb-2">Add Position</h1>
+        <p className="text-soft-500 mb-8">Add a current or past job to build your portable reputation</p>
 
         {error && (
           <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6">
@@ -148,27 +148,27 @@ export default function NewPositionPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Company Details */}
-          <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-            <h2 className="text-xl font-semibold text-white mb-6">Company</h2>
+          <div className="bg-white border border-soft-200 rounded-xl p-6">
+            <h2 className="text-xl font-semibold text-navy-600 mb-6">Company</h2>
 
             <div className="space-y-4">
               {/* Company Name with Autocomplete */}
               <div className="relative" ref={suggestionsRef}>
-                <label className="block text-sm font-medium text-ink-300 mb-2">
+                <label className="block text-sm font-medium text-soft-500 mb-2">
                   Company Name *
                 </label>
 
                 {selectedCompany ? (
-                  <div className="flex items-center gap-3 bg-brand-600/10 border border-brand-500/30 rounded-xl px-4 py-3">
+                  <div className="flex items-center gap-3 bg-navy-600/10 border border-gold-300/30 rounded-xl px-4 py-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-white font-medium">{selectedCompany.name}</span>
+                        <span className="text-navy-600 font-medium">{selectedCompany.name}</span>
                         {selectedCompany.verification_status === 'verified' && (
-                          <span className="text-brand-400 text-xs">✓ Verified</span>
+                          <span className="text-navy-500 text-xs">✓ Verified</span>
                         )}
                       </div>
                       {(selectedCompany.city || selectedCompany.state) && (
-                        <p className="text-sm text-ink-400">
+                        <p className="text-sm text-soft-500">
                           {[selectedCompany.city, selectedCompany.state].filter(Boolean).join(', ')}
                         </p>
                       )}
@@ -176,7 +176,7 @@ export default function NewPositionPage() {
                     <button
                       type="button"
                       onClick={handleClearCompany}
-                      className="text-ink-400 hover:text-white text-sm px-2 py-1 rounded transition-colors"
+                      className="text-soft-500 hover:text-navy-600 text-sm px-2 py-1 rounded transition-colors"
                     >
                       Change
                     </button>
@@ -192,49 +192,49 @@ export default function NewPositionPage() {
                           if (suggestions.length > 0) setShowSuggestions(true)
                         }}
                         placeholder="Start typing to search existing companies..."
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
                       />
                       {searchingCompanies && (
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-500 text-sm">
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-soft-400 text-sm">
                           Searching...
                         </div>
                       )}
                     </div>
 
                     {showSuggestions && suggestions.length > 0 && (
-                      <div className="absolute z-10 w-full mt-1 bg-ink-900 border border-white/10 rounded-xl shadow-xl overflow-hidden">
+                      <div className="absolute z-10 w-full mt-1 bg-soft-50 border border-soft-200 rounded-xl shadow-xl overflow-hidden">
                         {suggestions.map((company) => (
                           <button
                             key={company.id}
                             type="button"
                             onClick={() => handleSelectCompany(company)}
-                            className="w-full text-left px-4 py-3 hover:bg-white/10 transition-colors border-b border-white/5 last:border-0"
+                            className="w-full text-left px-4 py-3 hover:bg-soft-100 transition-colors border-b border-soft-100 last:border-0"
                           >
                             <div className="flex items-center gap-2">
-                              <span className="text-white font-medium">{company.name}</span>
+                              <span className="text-navy-600 font-medium">{company.name}</span>
                               {company.verification_status === 'verified' && (
-                                <span className="text-brand-400 text-xs px-2 py-0.5 bg-brand-500/10 rounded-full">✓ Verified</span>
+                                <span className="text-navy-500 text-xs px-2 py-0.5 bg-navy-500/10 rounded-full">✓ Verified</span>
                               )}
                               {company.verification_status === 'registered' && (
                                 <span className="text-yellow-400 text-xs px-2 py-0.5 bg-yellow-500/10 rounded-full">Registered</span>
                               )}
                             </div>
                             {(company.city || company.state) && (
-                              <p className="text-sm text-ink-500">
+                              <p className="text-sm text-soft-400">
                                 {[company.city, company.state].filter(Boolean).join(', ')}
                               </p>
                             )}
                           </button>
                         ))}
-                        <div className="px-4 py-2 bg-white/5 text-xs text-ink-500">
+                        <div className="px-4 py-2 bg-white text-xs text-soft-400">
                           Don&apos;t see your company? Just type the full name and fill in details below.
                         </div>
                       </div>
                     )}
 
                     {companyQuery.length >= 2 && !searchingCompanies && suggestions.length === 0 && showSuggestions && (
-                      <div className="absolute z-10 w-full mt-1 bg-ink-900 border border-white/10 rounded-xl shadow-xl px-4 py-3">
-                        <p className="text-sm text-ink-400">
+                      <div className="absolute z-10 w-full mt-1 bg-soft-50 border border-soft-200 rounded-xl shadow-xl px-4 py-3">
+                        <p className="text-sm text-soft-500">
                           No existing companies found for &ldquo;{companyQuery}&rdquo; — fill in the details below to create it.
                         </p>
                       </div>
@@ -247,19 +247,19 @@ export default function NewPositionPage() {
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-ink-300 mb-2">City</label>
-                      <input type="text" name="city" placeholder="Bellefonte" className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                      <label className="block text-sm font-medium text-soft-500 mb-2">City</label>
+                      <input type="text" name="city" placeholder="Bellefonte" className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-ink-300 mb-2">State</label>
-                      <input type="text" name="state" maxLength={2} placeholder="PA" className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                      <label className="block text-sm font-medium text-soft-500 mb-2">State</label>
+                      <input type="text" name="state" maxLength={2} placeholder="PA" className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500" />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-ink-300 mb-2">HR Email (optional)</label>
-                    <input type="email" name="hr_email" placeholder="hr@company.com" className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500" />
-                    <p className="text-xs text-ink-500 mt-1">If provided, HR will receive a verification request</p>
+                    <label className="block text-sm font-medium text-soft-500 mb-2">HR Email (optional)</label>
+                    <input type="email" name="hr_email" placeholder="hr@company.com" className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500" />
+                    <p className="text-xs text-soft-400 mt-1">If provided, HR will receive a verification request</p>
                   </div>
                 </>
               )}
@@ -275,40 +275,40 @@ export default function NewPositionPage() {
           </div>
 
           {/* Position Details */}
-          <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-            <h2 className="text-xl font-semibold text-white mb-6">Position Details</h2>
+          <div className="bg-white border border-soft-200 rounded-xl p-6">
+            <h2 className="text-xl font-semibold text-navy-600 mb-6">Position Details</h2>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-ink-300 mb-2">Job Title *</label>
-                <input type="text" name="title" required placeholder="CEO" className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                <label className="block text-sm font-medium text-soft-500 mb-2">Job Title *</label>
+                <input type="text" name="title" required placeholder="CEO" className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-ink-300 mb-2">Start Date *</label>
-                  <input type="date" name="start_date" required className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                  <label className="block text-sm font-medium text-soft-500 mb-2">Start Date *</label>
+                  <input type="date" name="start_date" required className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 focus:outline-none focus:ring-2 focus:ring-navy-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-ink-300 mb-2">End Date</label>
-                  <input type="date" name="end_date" className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                  <label className="block text-sm font-medium text-soft-500 mb-2">End Date</label>
+                  <input type="date" name="end_date" className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 focus:outline-none focus:ring-2 focus:ring-navy-500" />
                 </div>
               </div>
 
               <label className="flex items-center gap-2">
                 <input type="checkbox" name="current" className="w-4 h-4" />
-                <span className="text-sm text-ink-300">I currently work here</span>
+                <span className="text-sm text-soft-500">I currently work here</span>
               </label>
 
               <div>
-                <label className="block text-sm font-medium text-ink-300 mb-2">Work Email (optional)</label>
+                <label className="block text-sm font-medium text-soft-500 mb-2">Work Email (optional)</label>
                 <input
                   type="email"
                   name="work_email"
                   placeholder={selectedCompany?.email_domain ? `you@${selectedCompany.email_domain}` : 'you@company.com'}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
                 />
-                <p className="text-xs text-ink-500 mt-1">
+                <p className="text-xs text-soft-400 mt-1">
                   {selectedCompany?.email_domain
                     ? `Enter your @${selectedCompany.email_domain} email for instant verification`
                     : 'For instant verification if company email domain is verified'}
@@ -319,10 +319,10 @@ export default function NewPositionPage() {
 
           {/* Submit */}
           <div className="flex gap-4 pb-8">
-            <button type="button" onClick={() => router.back()} className="flex-1 bg-white/5 hover:bg-white/10 text-white py-4 rounded-xl font-semibold transition-all">
+            <button type="button" onClick={() => router.back()} className="flex-1 bg-white hover:bg-soft-100 text-navy-600 py-4 rounded-xl font-semibold transition-all">
               Cancel
             </button>
-            <button type="submit" disabled={loading} className="flex-1 bg-brand-600 hover:bg-brand-500 disabled:bg-ink-700 text-white py-4 rounded-xl font-semibold transition-all text-lg">
+            <button type="submit" disabled={loading} className="flex-1 bg-navy-600 hover:bg-navy-500 disabled:bg-soft-300 text-white py-4 rounded-xl font-semibold transition-all text-lg">
               {loading ? 'Adding Position...' : 'Add Position'}
             </button>
           </div>

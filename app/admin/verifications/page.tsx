@@ -43,7 +43,7 @@ export default function AdminVerificationsPage() {
       <div className="p-8">
         <div className="text-center py-20">
           <div className="text-4xl mb-4">⏳</div>
-          <p className="text-ink-400">Loading verification requests...</p>
+          <p className="text-soft-500">Loading verification requests...</p>
         </div>
       </div>
     )
@@ -53,8 +53,8 @@ export default function AdminVerificationsPage() {
     <div className="p-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Verification Requests</h1>
-        <p className="text-ink-400">Review and approve company verification requests</p>
+        <h1 className="text-3xl font-bold text-navy-600 mb-2">Verification Requests</h1>
+        <p className="text-soft-500">Review and approve company verification requests</p>
       </div>
 
       {error && (
@@ -75,12 +75,12 @@ export default function AdminVerificationsPage() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-20 bg-white/5 border border-white/10 rounded-xl">
+        <div className="text-center py-20 bg-white border border-soft-200 rounded-xl">
           <div className="text-6xl mb-6">✅</div>
-          <h2 className="text-2xl font-semibold text-white mb-4">
+          <h2 className="text-2xl font-semibold text-navy-600 mb-4">
             All caught up!
           </h2>
-          <p className="text-ink-400">
+          <p className="text-soft-500">
             No pending verification requests
           </p>
         </div>
@@ -133,7 +133,7 @@ function VerificationRequestCard({
   }
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+    <div className="bg-white border border-soft-200 rounded-xl p-6">
       {error && (
         <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-4">
           <p className="text-red-400 text-sm">{error}</p>
@@ -144,16 +144,16 @@ function VerificationRequestCard({
       <div className="mb-6">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h3 className="text-2xl font-semibold text-white mb-2">
+            <h3 className="text-2xl font-semibold text-navy-600 mb-2">
               {request.company.name}
             </h3>
             {request.company.city && request.company.state && (
-              <p className="text-ink-400 mb-1">
+              <p className="text-soft-500 mb-1">
                 📍 {request.company.city}, {request.company.state}
               </p>
             )}
             {request.company.industry && (
-              <p className="text-ink-400">
+              <p className="text-soft-500">
                 🏢 {request.company.industry}
               </p>
             )}
@@ -162,7 +162,7 @@ function VerificationRequestCard({
                 href={request.company.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-brand-400 hover:text-brand-300 text-sm mt-2 inline-block"
+                className="text-navy-500 hover:text-navy-400 text-sm mt-2 inline-block"
               >
                 {request.company.website} →
               </a>
@@ -174,27 +174,27 @@ function VerificationRequestCard({
         </div>
 
         {/* Request Details */}
-        <div className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-2">
+        <div className="bg-white border border-soft-200 rounded-lg p-4 space-y-2">
           <div className="flex items-start justify-between text-sm">
-            <span className="text-ink-400">Submitted by:</span>
-            <span className="text-white">{request.submitted_email}</span>
+            <span className="text-soft-500">Submitted by:</span>
+            <span className="text-navy-600">{request.submitted_email}</span>
           </div>
           <div className="flex items-start justify-between text-sm">
-            <span className="text-ink-400">Requested domain:</span>
-            <code className="text-brand-400 bg-brand-500/10 px-2 py-1 rounded">
+            <span className="text-soft-500">Requested domain:</span>
+            <code className="text-navy-500 bg-navy-500/10 px-2 py-1 rounded">
               {request.requested_domain || 'Not provided'}
             </code>
           </div>
           <div className="flex items-start justify-between text-sm">
-            <span className="text-ink-400">Submitted:</span>
-            <span className="text-white">
+            <span className="text-soft-500">Submitted:</span>
+            <span className="text-navy-600">
               {new Date(request.created_at).toLocaleDateString()}
             </span>
           </div>
           {request.company.hr_email && (
             <div className="flex items-start justify-between text-sm">
-              <span className="text-ink-400">HR Email:</span>
-              <span className="text-white">{request.company.hr_email}</span>
+              <span className="text-soft-500">HR Email:</span>
+              <span className="text-navy-600">{request.company.hr_email}</span>
             </div>
           )}
         </div>
@@ -203,7 +203,7 @@ function VerificationRequestCard({
       {/* Review Form */}
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-ink-300 mb-2">
+          <label className="block text-sm font-medium text-soft-500 mb-2">
             Email Domain (for approval) *
           </label>
           <input
@@ -211,15 +211,15 @@ function VerificationRequestCard({
             value={emailDomain}
             onChange={(e) => setEmailDomain(e.target.value.toLowerCase())}
             placeholder="example.com"
-            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
           />
-          <p className="text-xs text-ink-500 mt-2">
+          <p className="text-xs text-soft-400 mt-2">
             Workers with @{emailDomain || 'example.com'} emails will be able to instantly verify positions
           </p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-ink-300 mb-2">
+          <label className="block text-sm font-medium text-soft-500 mb-2">
             Admin Notes (optional)
           </label>
           <textarea
@@ -227,7 +227,7 @@ function VerificationRequestCard({
             onChange={(e) => setAdminNotes(e.target.value)}
             placeholder="Internal notes about this verification..."
             rows={3}
-            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+            className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500 resize-none"
           />
         </div>
 
@@ -236,20 +236,20 @@ function VerificationRequestCard({
           <button
             onClick={() => handleAction('denied')}
             disabled={reviewing}
-            className="flex-1 bg-red-600 hover:bg-red-500 disabled:bg-ink-700 disabled:text-ink-500 text-white py-3 rounded-xl font-semibold transition-all"
+            className="flex-1 bg-red-600 hover:bg-red-500 disabled:bg-soft-300 disabled:text-soft-400 text-navy-600 py-3 rounded-xl font-semibold transition-all"
           >
             Deny
           </button>
           <button
             onClick={() => handleAction('approved')}
             disabled={reviewing || !emailDomain}
-            className="flex-1 bg-green-600 hover:bg-green-500 disabled:bg-ink-700 disabled:text-ink-500 text-white py-3 rounded-xl font-semibold transition-all"
+            className="flex-1 bg-green-600 hover:bg-green-500 disabled:bg-soft-300 disabled:text-soft-400 text-navy-600 py-3 rounded-xl font-semibold transition-all"
           >
             {reviewing ? 'Processing...' : 'Approve & Verify'}
           </button>
         </div>
 
-        <p className="text-xs text-ink-500 text-center">
+        <p className="text-xs text-soft-400 text-center">
           Approval will send email to {request.submitted_email}
         </p>
       </div>

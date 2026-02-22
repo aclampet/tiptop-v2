@@ -41,25 +41,25 @@ export default async function QRCodesPage() {
     <div className="p-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">QR Codes</h1>
-        <p className="text-ink-400">
+        <h1 className="text-3xl font-bold text-navy-600 mb-2">QR Codes</h1>
+        <p className="text-soft-500">
           Share your QR codes to collect reviews for each position
         </p>
       </div>
 
       {/* No Positions */}
       {(!positions || positions.length === 0) && (
-        <div className="text-center py-20 bg-white/5 border border-white/10 rounded-xl">
+        <div className="text-center py-20 bg-white border border-soft-200 rounded-xl">
           <div className="text-6xl mb-6">📱</div>
-          <h2 className="text-2xl font-semibold text-white mb-4">
+          <h2 className="text-2xl font-semibold text-navy-600 mb-4">
             No positions yet
           </h2>
-          <p className="text-ink-400 mb-8 max-w-md mx-auto">
+          <p className="text-soft-500 mb-8 max-w-md mx-auto">
             Add a position first to generate QR codes for collecting reviews.
           </p>
           <a
             href="/dashboard/positions/new"
-            className="inline-block bg-brand-600 hover:bg-brand-500 text-white px-8 py-4 rounded-lg font-semibold transition-all"
+            className="inline-block bg-navy-600 hover:bg-navy-500 text-white px-8 py-4 rounded-lg font-semibold transition-all"
           >
             Add Your First Position
           </a>
@@ -70,15 +70,15 @@ export default async function QRCodesPage() {
       {positionsWithQR.length > 0 && (
         <div className="space-y-8">
           {positionsWithQR.map((position) => (
-            <div key={position.id} className="bg-white/5 border border-white/10 rounded-xl p-6">
+            <div key={position.id} className="bg-white border border-soft-200 rounded-xl p-6">
               <div className="mb-6">
-                <h2 className="text-xl font-semibold text-white mb-1">
+                <h2 className="text-xl font-semibold text-navy-600 mb-1">
                   {position.title}
                 </h2>
-                <p className="text-ink-400">
+                <p className="text-soft-500">
                   {position.company.name}
                   {position.company.city && position.company.state && (
-                    <span className="text-ink-500"> • {position.company.city}, {position.company.state}</span>
+                    <span className="text-soft-400"> • {position.company.city}, {position.company.state}</span>
                   )}
                 </p>
                 
@@ -112,18 +112,18 @@ export default async function QRCodesPage() {
       {/* Positions Without QR — with generate button */}
       {positionsWithoutQR.length > 0 && (
         <div className="mt-8">
-          <h2 className="text-lg font-semibold text-white mb-4">
+          <h2 className="text-lg font-semibold text-navy-600 mb-4">
             Positions Missing QR Codes
           </h2>
           <div className="space-y-3">
             {positionsWithoutQR.map((position) => (
               <div 
                 key={position.id}
-                className="bg-white/5 border border-white/10 rounded-lg p-4 flex items-center justify-between"
+                className="bg-white border border-soft-200 rounded-lg p-4 flex items-center justify-between"
               >
                 <div>
-                  <p className="text-white font-medium">{position.title}</p>
-                  <p className="text-sm text-ink-400">{position.company.name}</p>
+                  <p className="text-navy-600 font-medium">{position.title}</p>
+                  <p className="text-sm text-soft-500">{position.company.name}</p>
                 </div>
                 <GenerateQRButton
                   positionId={position.id}

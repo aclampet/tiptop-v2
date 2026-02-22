@@ -76,7 +76,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="p-8 flex items-center justify-center">
-        <p className="text-ink-400">Loading...</p>
+        <p className="text-soft-500">Loading...</p>
       </div>
     )
   }
@@ -84,8 +84,8 @@ export default function SettingsPage() {
   return (
     <div className="p-8 max-w-2xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
-        <p className="text-ink-400">Manage your profile and account</p>
+        <h1 className="text-3xl font-bold text-navy-600 mb-2">Settings</h1>
+        <p className="text-soft-500">Manage your profile and account</p>
       </div>
 
       {message && (
@@ -100,25 +100,25 @@ export default function SettingsPage() {
 
       {/* Profile Settings */}
       <form onSubmit={handleSaveProfile} className="space-y-6">
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-          <h2 className="text-xl font-semibold text-white mb-6">Profile</h2>
+        <div className="bg-white border border-soft-200 rounded-xl p-6">
+          <h2 className="text-xl font-semibold text-navy-600 mb-6">Profile</h2>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">
+              <label className="block text-sm font-medium text-soft-500 mb-2">
                 Email
               </label>
               <input
                 type="email"
                 value={email}
                 disabled
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-ink-500 cursor-not-allowed"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-soft-400 cursor-not-allowed"
               />
-              <p className="text-xs text-ink-500 mt-1">Email cannot be changed</p>
+              <p className="text-xs text-soft-400 mt-1">Email cannot be changed</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">
+              <label className="block text-sm font-medium text-soft-500 mb-2">
                 Display Name
               </label>
               <input
@@ -126,12 +126,12 @@ export default function SettingsPage() {
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">
+              <label className="block text-sm font-medium text-soft-500 mb-2">
                 Bio
               </label>
               <textarea
@@ -140,9 +140,9 @@ export default function SettingsPage() {
                 rows={3}
                 maxLength={500}
                 placeholder="Tell customers about yourself..."
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500 resize-none"
               />
-              <p className="text-xs text-ink-500 mt-1">{bio.length}/500 characters</p>
+              <p className="text-xs text-soft-400 mt-1">{bio.length}/500 characters</p>
             </div>
 
             <div>
@@ -154,8 +154,8 @@ export default function SettingsPage() {
                   className="w-4 h-4"
                 />
                 <div>
-                  <span className="text-sm text-ink-300">Public profile</span>
-                  <p className="text-xs text-ink-500">
+                  <span className="text-sm text-soft-500">Public profile</span>
+                  <p className="text-xs text-soft-400">
                     When enabled, your profile is visible to anyone with the link
                   </p>
                 </div>
@@ -167,7 +167,7 @@ export default function SettingsPage() {
         <button
           type="submit"
           disabled={saving}
-          className="w-full bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white py-3 rounded-xl font-semibold transition-all"
+          className="w-full bg-navy-600 hover:bg-navy-500 disabled:opacity-50 text-white py-3 rounded-xl font-semibold transition-all"
         >
           {saving ? 'Saving...' : 'Save Changes'}
         </button>

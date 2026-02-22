@@ -28,8 +28,8 @@ export default async function AdminReviewsPage() {
     <div className="p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Reviews</h1>
-          <p className="text-ink-400">
+          <h1 className="text-3xl font-bold text-navy-600 mb-2">Reviews</h1>
+          <p className="text-soft-500">
             {totalCount || 0} total reviews
             {flaggedCount > 0 && (
               <span className="text-red-400 ml-2">({flaggedCount} flagged)</span>
@@ -42,10 +42,10 @@ export default async function AdminReviewsPage() {
         {reviews?.map((review: any) => (
           <div
             key={review.id}
-            className={`bg-white/5 border rounded-xl p-6 ${
+            className={`bg-white border rounded-xl p-6 ${
               review.is_flagged
                 ? 'border-red-500/20'
-                : 'border-white/10'
+                : 'border-soft-200'
             }`}
           >
             <div className="flex items-start justify-between mb-3">
@@ -54,15 +54,15 @@ export default async function AdminReviewsPage() {
                   {'⭐'.repeat(review.rating)}
                   {'☆'.repeat(5 - review.rating)}
                 </div>
-                <p className="text-white font-medium">
+                <p className="text-navy-600 font-medium">
                   {review.position?.worker?.display_name}
-                  <span className="text-ink-400 font-normal">
+                  <span className="text-soft-500 font-normal">
                     {' '}— {review.position?.title} at {review.position?.company?.name}
                   </span>
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-xs text-ink-500">
+                <p className="text-xs text-soft-400">
                   {new Date(review.created_at).toLocaleDateString()}
                 </p>
                 {review.is_flagged && (
@@ -72,12 +72,12 @@ export default async function AdminReviewsPage() {
             </div>
 
             {review.comment && (
-              <p className="text-ink-300 text-sm mb-3 italic">
+              <p className="text-soft-500 text-sm mb-3 italic">
                 &ldquo;{review.comment}&rdquo;
               </p>
             )}
 
-            <div className="flex items-center gap-4 text-xs text-ink-500">
+            <div className="flex items-center gap-4 text-xs text-soft-400">
               <span>By: {review.reviewer_name || 'Anonymous'}</span>
               <span>ID: {review.id.slice(0, 8)}...</span>
             </div>
@@ -85,9 +85,9 @@ export default async function AdminReviewsPage() {
         ))}
 
         {(!reviews || reviews.length === 0) && (
-          <div className="text-center py-16 bg-white/5 border border-white/10 rounded-xl">
+          <div className="text-center py-16 bg-white border border-soft-200 rounded-xl">
             <div className="text-6xl mb-6">⭐</div>
-            <p className="text-ink-400">No reviews yet</p>
+            <p className="text-soft-500">No reviews yet</p>
           </div>
         )}
       </div>

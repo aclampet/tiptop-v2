@@ -96,17 +96,17 @@ export default function QRCodeDisplay({ token, position, isActive }: QRCodeDispl
       {/* Actions & Info */}
       <div className="flex flex-col justify-center space-y-4">
         <div>
-          <h3 className="text-sm font-medium text-ink-300 mb-2">Review Link</h3>
+          <h3 className="text-sm font-medium text-soft-500 mb-2">Review Link</h3>
           <div className="flex gap-2">
             <input
               type="text"
               value={reviewUrl}
               readOnly
-              className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
+              className="flex-1 px-4 py-2 bg-white border border-soft-200 rounded-lg text-navy-600 text-sm"
             />
             <button
               onClick={handleCopyLink}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+              className="px-4 py-2 bg-soft-100 hover:bg-white/20 text-navy-600 rounded-lg transition-colors"
             >
               {copied ? '✓ Copied' : 'Copy'}
             </button>
@@ -116,21 +116,21 @@ export default function QRCodeDisplay({ token, position, isActive }: QRCodeDispl
         <button
           onClick={handleDownload}
           disabled={!isActive}
-          className="w-full bg-brand-600 hover:bg-brand-500 disabled:bg-ink-700 disabled:text-ink-500 text-white py-3 rounded-lg font-semibold transition-all"
+          className="w-full bg-navy-600 hover:bg-navy-500 disabled:bg-soft-300 disabled:text-soft-400 text-navy-600 py-3 rounded-lg font-semibold transition-all"
         >
           📥 Download PNG
         </button>
 
-        <div className="bg-white/5 rounded-lg p-4 space-y-2 text-sm">
-          <div className="flex items-center justify-between text-ink-300">
+        <div className="bg-white rounded-lg p-4 space-y-2 text-sm">
+          <div className="flex items-center justify-between text-soft-500">
             <span>Label:</span>
-            <span className="text-white">{token.label}</span>
+            <span className="text-navy-600">{token.label}</span>
           </div>
-          <div className="flex items-center justify-between text-ink-300">
+          <div className="flex items-center justify-between text-soft-500">
             <span>Scans:</span>
-            <span className="text-white">{token.scan_count || 0}</span>
+            <span className="text-navy-600">{token.scan_count || 0}</span>
           </div>
-          <div className="flex items-center justify-between text-ink-300">
+          <div className="flex items-center justify-between text-soft-500">
             <span>Status:</span>
             <span className={isActive ? 'text-green-400' : 'text-yellow-400'}>
               {isActive ? 'Active' : 'Inactive'}

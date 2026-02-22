@@ -48,7 +48,7 @@ export default function GenerateQRButton({
       <button
         onClick={handleGenerate}
         disabled={loading}
-        className="bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+        className="bg-navy-600 hover:bg-navy-500 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all"
       >
         {loading ? 'Generating...' : 'Generate QR Code'}
       </button>

@@ -61,8 +61,8 @@ export default function NewCompanyPage() {
   return (
     <div className="p-8 max-w-3xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Add Verified Company</h1>
-        <p className="text-ink-400">Create a new verified company with email domain</p>
+        <h1 className="text-3xl font-bold text-navy-600 mb-2">Add Verified Company</h1>
+        <p className="text-soft-500">Create a new verified company with email domain</p>
       </div>
 
       {error && (
@@ -73,12 +73,12 @@ export default function NewCompanyPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Info */}
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Basic Information</h2>
+        <div className="bg-white border border-soft-200 rounded-xl p-6">
+          <h2 className="text-xl font-semibold text-navy-600 mb-4">Basic Information</h2>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">
+              <label className="block text-sm font-medium text-soft-500 mb-2">
                 Company Name *
               </label>
               <input
@@ -87,12 +87,12 @@ export default function NewCompanyPage() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 placeholder="Happy Valley Casino"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">
+              <label className="block text-sm font-medium text-soft-500 mb-2">
                 Industry
               </label>
               <input
@@ -100,12 +100,12 @@ export default function NewCompanyPage() {
                 value={industry}
                 onChange={(e) => setIndustry(e.target.value)}
                 placeholder="Hospitality"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">
+              <label className="block text-sm font-medium text-soft-500 mb-2">
                 Website
               </label>
               <input
@@ -113,19 +113,19 @@ export default function NewCompanyPage() {
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
                 placeholder="https://happyvalley.com"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
               />
             </div>
           </div>
         </div>
 
         {/* Location */}
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Location</h2>
+        <div className="bg-white border border-soft-200 rounded-xl p-6">
+          <h2 className="text-xl font-semibold text-navy-600 mb-4">Location</h2>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">
+              <label className="block text-sm font-medium text-soft-500 mb-2">
                 Address
               </label>
               <input
@@ -133,13 +133,13 @@ export default function NewCompanyPage() {
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="123 Happy Valley Dr"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
               />
             </div>
 
             <div className="grid grid-cols-3 gap-4">
               <div className="col-span-2">
-                <label className="block text-sm font-medium text-ink-300 mb-2">
+                <label className="block text-sm font-medium text-soft-500 mb-2">
                   City
                 </label>
                 <input
@@ -147,11 +147,11 @@ export default function NewCompanyPage() {
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="State College"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-ink-300 mb-2">
+                <label className="block text-sm font-medium text-soft-500 mb-2">
                   State
                 </label>
                 <input
@@ -160,13 +160,13 @@ export default function NewCompanyPage() {
                   onChange={(e) => setState(e.target.value.toUpperCase())}
                   maxLength={2}
                   placeholder="PA"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">
+              <label className="block text-sm font-medium text-soft-500 mb-2">
                 ZIP Code
               </label>
               <input
@@ -174,15 +174,15 @@ export default function NewCompanyPage() {
                 value={zip}
                 onChange={(e) => setZip(e.target.value)}
                 placeholder="16803"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
               />
             </div>
           </div>
         </div>
 
         {/* Verification Settings */}
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Verification Settings</h2>
+        <div className="bg-white border border-soft-200 rounded-xl p-6">
+          <h2 className="text-xl font-semibold text-navy-600 mb-4">Verification Settings</h2>
           
           <div className="space-y-4">
             <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
@@ -192,7 +192,7 @@ export default function NewCompanyPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">
+              <label className="block text-sm font-medium text-soft-500 mb-2">
                 Email Domain (for instant verification)
               </label>
               <input
@@ -200,15 +200,15 @@ export default function NewCompanyPage() {
                 value={emailDomain}
                 onChange={(e) => setEmailDomain(e.target.value.toLowerCase())}
                 placeholder="happyvalley.com"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
               />
-              <p className="text-xs text-ink-500 mt-2">
+              <p className="text-xs text-soft-400 mt-2">
                 Workers with @{emailDomain || 'example.com'} emails can instantly verify positions
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">
+              <label className="block text-sm font-medium text-soft-500 mb-2">
                 HR Email
               </label>
               <input
@@ -216,9 +216,9 @@ export default function NewCompanyPage() {
                 value={hrEmail}
                 onChange={(e) => setHrEmail(e.target.value)}
                 placeholder="hr@happyvalley.com"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
               />
-              <p className="text-xs text-ink-500 mt-2">
+              <p className="text-xs text-soft-400 mt-2">
                 Position verification requests will be sent here
               </p>
             </div>
@@ -230,14 +230,14 @@ export default function NewCompanyPage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="flex-1 bg-white/5 hover:bg-white/10 text-white py-3 rounded-xl font-semibold transition-all"
+            className="flex-1 bg-white hover:bg-soft-100 text-navy-600 py-3 rounded-xl font-semibold transition-all"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={saving || !name}
-            className="flex-1 bg-brand-600 hover:bg-brand-500 disabled:bg-ink-700 disabled:text-ink-500 text-white py-3 rounded-xl font-semibold transition-all"
+            className="flex-1 bg-navy-600 hover:bg-navy-500 disabled:bg-soft-300 disabled:text-soft-400 text-navy-600 py-3 rounded-xl font-semibold transition-all"
           >
             {saving ? 'Creating...' : 'Create Verified Company'}
           </button>

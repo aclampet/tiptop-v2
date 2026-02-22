@@ -104,10 +104,10 @@ export default function ReviewPage({ params }: { params: { tokenId: string } }) 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-ink-950 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-4">⭐</div>
-          <p className="text-ink-400">Loading...</p>
+          <p className="text-soft-500">Loading...</p>
         </div>
       </div>
     )
@@ -115,20 +115,20 @@ export default function ReviewPage({ params }: { params: { tokenId: string } }) 
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-ink-950 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="max-w-md w-full text-center">
           <div className="text-6xl mb-6">❌</div>
-          <h1 className="text-2xl font-bold text-white mb-4">
+          <h1 className="text-2xl font-bold text-navy-600 mb-4">
             {error === 'This QR code is no longer active' 
               ? 'QR Code Inactive'
               : 'Invalid QR Code'}
           </h1>
-          <p className="text-ink-400 mb-8">
+          <p className="text-soft-500 mb-8">
             {error || 'This QR code is not valid or has been deactivated.'}
           </p>
           <a
             href="https://tiptop.review"
-            className="inline-block text-brand-400 hover:text-brand-300 transition-colors"
+            className="inline-block text-navy-500 hover:text-navy-400 transition-colors"
           >
             Learn about TipTop →
           </a>
@@ -139,16 +139,16 @@ export default function ReviewPage({ params }: { params: { tokenId: string } }) 
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-ink-950 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="max-w-md w-full text-center">
           <div className="bg-green-500/10 border border-green-500/20 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
             <div className="text-5xl">✓</div>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-4">Thank you!</h1>
-          <p className="text-ink-300 mb-2">
+          <h1 className="text-3xl font-bold text-navy-600 mb-4">Thank you!</h1>
+          <p className="text-soft-500 mb-2">
             Your review for <strong>{data.worker.display_name}</strong> has been saved.
           </p>
-          <p className="text-sm text-ink-500 mb-8">
+          <p className="text-sm text-soft-400 mb-8">
             This review is now part of their permanent professional record.
           </p>
           <div className="text-2xl mb-8">
@@ -156,14 +156,14 @@ export default function ReviewPage({ params }: { params: { tokenId: string } }) 
           </div>
           <a
             href={`/worker/${data.worker.slug}`}
-            className="inline-block text-brand-400 hover:text-brand-300 transition-colors text-sm"
+            className="inline-block text-navy-500 hover:text-navy-400 transition-colors text-sm"
           >
             View {data.worker.display_name}'s profile →
           </a>
-          <div className="mt-12 pt-8 border-t border-white/10">
-            <p className="text-xs text-ink-500">
+          <div className="mt-12 pt-8 border-t border-soft-200">
+            <p className="text-xs text-soft-400">
               Powered by{' '}
-              <a href="https://tiptop.review" className="text-brand-600 hover:text-brand-400">
+              <a href="https://tiptop.review" className="text-navy-600 hover:text-navy-500">
                 TipTop.review
               </a>
             </p>
@@ -177,21 +177,21 @@ export default function ReviewPage({ params }: { params: { tokenId: string } }) 
   const stars = Array.from({ length: 5 }, (_, i) => i + 1)
 
   return (
-    <div className="min-h-screen bg-ink-950 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="max-w-lg w-full">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="text-5xl mb-4">⭐</div>
-          <h1 className="text-2xl font-bold text-white mb-2">
+          <h1 className="text-2xl font-bold text-navy-600 mb-2">
             Rate Your Experience
           </h1>
-          <p className="text-ink-400">
+          <p className="text-soft-500">
             How was your experience with {data.worker.display_name}?
           </p>
         </div>
 
         {/* Worker & Position Context */}
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6 mb-8">
+        <div className="bg-white border border-soft-200 rounded-xl p-6 mb-8">
           <div className="text-center">
             {data.worker.avatar_url && (
               <img
@@ -200,29 +200,29 @@ export default function ReviewPage({ params }: { params: { tokenId: string } }) 
                 className="w-16 h-16 rounded-full mx-auto mb-4"
               />
             )}
-            <h2 className="text-xl font-semibold text-white mb-1">
+            <h2 className="text-xl font-semibold text-navy-600 mb-1">
               {data.worker.display_name}
             </h2>
-            <p className="text-brand-400 mb-1">
+            <p className="text-navy-500 mb-1">
               {data.position.title}
             </p>
-            <p className="text-sm text-ink-400 mb-4">
+            <p className="text-sm text-soft-500 mb-4">
               {data.company.name}
               {data.company.verification_status === 'verified' && (
-                <span className="text-brand-400 ml-1">✓</span>
+                <span className="text-navy-500 ml-1">✓</span>
               )}
             </p>
 
             {/* Position Stats */}
             {data.position.review_count > 0 && (
-              <div className="flex items-center justify-center gap-4 text-sm pt-4 border-t border-white/10">
-                <div className="text-ink-400">
-                  <span className="text-white font-semibold">
+              <div className="flex items-center justify-center gap-4 text-sm pt-4 border-t border-soft-200">
+                <div className="text-soft-500">
+                  <span className="text-navy-600 font-semibold">
                     {data.position.rating.toFixed(1)}
                   </span>
                   {' '}⭐ as {data.position.title}
                 </div>
-                <div className="text-ink-500">
+                <div className="text-soft-400">
                   {data.position.review_count} reviews
                 </div>
               </div>
@@ -240,7 +240,7 @@ export default function ReviewPage({ params }: { params: { tokenId: string } }) 
         </div>
 
         {/* Review Form */}
-        <form onSubmit={handleSubmit} className="bg-white/5 border border-white/10 rounded-xl p-8">
+        <form onSubmit={handleSubmit} className="bg-white border border-soft-200 rounded-xl p-8">
           {error && (
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6">
               <p className="text-red-400 text-sm">{error}</p>
@@ -249,7 +249,7 @@ export default function ReviewPage({ params }: { params: { tokenId: string } }) 
 
           {/* Star Rating */}
           <div className="mb-8">
-            <label className="block text-center text-sm font-medium text-ink-300 mb-4">
+            <label className="block text-center text-sm font-medium text-soft-500 mb-4">
               Your Rating *
             </label>
             <div className="flex items-center justify-center gap-2">
@@ -267,7 +267,7 @@ export default function ReviewPage({ params }: { params: { tokenId: string } }) 
               ))}
             </div>
             {rating > 0 && (
-              <p className="text-center text-sm text-brand-400 mt-3">
+              <p className="text-center text-sm text-navy-500 mt-3">
                 {rating === 5 && 'Excellent!'}
                 {rating === 4 && 'Very Good!'}
                 {rating === 3 && 'Good'}
@@ -279,7 +279,7 @@ export default function ReviewPage({ params }: { params: { tokenId: string } }) 
 
           {/* Comment */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-ink-300 mb-2">
+            <label className="block text-sm font-medium text-soft-500 mb-2">
               Tell us more (optional)
             </label>
             <textarea
@@ -288,16 +288,16 @@ export default function ReviewPage({ params }: { params: { tokenId: string } }) 
               placeholder="What made your experience great? What could be improved?"
               rows={4}
               maxLength={500}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+              className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500 resize-none"
             />
-            <p className="text-xs text-ink-500 mt-1">
+            <p className="text-xs text-soft-400 mt-1">
               {comment.length}/500 characters
             </p>
           </div>
 
           {/* Reviewer Name */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-ink-300 mb-2">
+            <label className="block text-sm font-medium text-soft-500 mb-2">
               Your Name (optional)
             </label>
             <input
@@ -306,9 +306,9 @@ export default function ReviewPage({ params }: { params: { tokenId: string } }) 
               onChange={(e) => setReviewerName(e.target.value)}
               placeholder="John Smith"
               maxLength={50}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
             />
-            <p className="text-xs text-ink-500 mt-1">
+            <p className="text-xs text-soft-400 mt-1">
               Your review will be public
             </p>
           </div>
@@ -317,21 +317,21 @@ export default function ReviewPage({ params }: { params: { tokenId: string } }) 
           <button
             type="submit"
             disabled={rating === 0 || submitting}
-            className="w-full bg-brand-600 hover:bg-brand-500 disabled:bg-ink-700 disabled:text-ink-500 text-white py-4 rounded-xl font-semibold transition-all active:scale-95"
+            className="w-full bg-navy-600 hover:bg-navy-500 disabled:bg-soft-300 disabled:text-soft-400 text-white py-4 rounded-xl font-semibold transition-all active:scale-95"
           >
             {submitting ? 'Submitting...' : 'Submit Review'}
           </button>
 
-          <p className="text-xs text-ink-500 text-center mt-4">
+          <p className="text-xs text-soft-400 text-center mt-4">
             By submitting, you agree your review may be displayed publicly
           </p>
         </form>
 
         {/* Footer */}
         <div className="text-center mt-8">
-          <p className="text-xs text-ink-500">
+          <p className="text-xs text-soft-400">
             Powered by{' '}
-            <a href="https://tiptop.review" className="text-brand-600 hover:text-brand-400">
+            <a href="https://tiptop.review" className="text-navy-600 hover:text-navy-500">
               TipTop.review
             </a>
           </p>

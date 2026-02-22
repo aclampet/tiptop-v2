@@ -92,7 +92,7 @@ export default function EditCompanyPage({ params }: { params: { id: string } }) 
       <div className="p-8">
         <div className="text-center py-20">
           <div className="text-4xl mb-4">⏳</div>
-          <p className="text-ink-400">Loading company...</p>
+          <p className="text-soft-500">Loading company...</p>
         </div>
       </div>
     )
@@ -101,8 +101,8 @@ export default function EditCompanyPage({ params }: { params: { id: string } }) 
   return (
     <div className="p-8 max-w-3xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Edit Company</h1>
-        <p className="text-ink-400">Update company information and verification status</p>
+        <h1 className="text-3xl font-bold text-navy-600 mb-2">Edit Company</h1>
+        <p className="text-soft-500">Update company information and verification status</p>
       </div>
 
       {error && (
@@ -113,12 +113,12 @@ export default function EditCompanyPage({ params }: { params: { id: string } }) 
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Info */}
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Basic Information</h2>
+        <div className="bg-white border border-soft-200 rounded-xl p-6">
+          <h2 className="text-xl font-semibold text-navy-600 mb-4">Basic Information</h2>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">
+              <label className="block text-sm font-medium text-soft-500 mb-2">
                 Company Name *
               </label>
               <input
@@ -126,12 +126,12 @@ export default function EditCompanyPage({ params }: { params: { id: string } }) 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 focus:outline-none focus:ring-2 focus:ring-navy-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">
+              <label className="block text-sm font-medium text-soft-500 mb-2">
                 Industry
               </label>
               <input
@@ -139,12 +139,12 @@ export default function EditCompanyPage({ params }: { params: { id: string } }) 
                 value={industry}
                 onChange={(e) => setIndustry(e.target.value)}
                 placeholder="e.g., Hospitality, Retail"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">
+              <label className="block text-sm font-medium text-soft-500 mb-2">
                 Website
               </label>
               <input
@@ -152,19 +152,19 @@ export default function EditCompanyPage({ params }: { params: { id: string } }) 
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
                 placeholder="https://example.com"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
               />
             </div>
           </div>
         </div>
 
         {/* Location */}
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Location</h2>
+        <div className="bg-white border border-soft-200 rounded-xl p-6">
+          <h2 className="text-xl font-semibold text-navy-600 mb-4">Location</h2>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">
+              <label className="block text-sm font-medium text-soft-500 mb-2">
                 Address
               </label>
               <input
@@ -172,24 +172,24 @@ export default function EditCompanyPage({ params }: { params: { id: string } }) 
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="123 Main St"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
               />
             </div>
 
             <div className="grid grid-cols-3 gap-4">
               <div className="col-span-2">
-                <label className="block text-sm font-medium text-ink-300 mb-2">
+                <label className="block text-sm font-medium text-soft-500 mb-2">
                   City
                 </label>
                 <input
                   type="text"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 focus:outline-none focus:ring-2 focus:ring-navy-500"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-ink-300 mb-2">
+                <label className="block text-sm font-medium text-soft-500 mb-2">
                   State
                 </label>
                 <input
@@ -198,50 +198,50 @@ export default function EditCompanyPage({ params }: { params: { id: string } }) 
                   onChange={(e) => setState(e.target.value)}
                   maxLength={2}
                   placeholder="PA"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">
+              <label className="block text-sm font-medium text-soft-500 mb-2">
                 ZIP Code
               </label>
               <input
                 type="text"
                 value={zip}
                 onChange={(e) => setZip(e.target.value)}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 focus:outline-none focus:ring-2 focus:ring-navy-500"
               />
             </div>
           </div>
         </div>
 
         {/* Verification */}
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Verification Settings</h2>
+        <div className="bg-white border border-soft-200 rounded-xl p-6">
+          <h2 className="text-xl font-semibold text-navy-600 mb-4">Verification Settings</h2>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">
+              <label className="block text-sm font-medium text-soft-500 mb-2">
                 Verification Status *
               </label>
               <select
                 value={verificationStatus}
                 onChange={(e) => setVerificationStatus(e.target.value)}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 focus:outline-none focus:ring-2 focus:ring-navy-500"
               >
                 <option value="verified">✓ Verified</option>
                 <option value="registered">Registered</option>
                 <option value="unverified">Unverified</option>
               </select>
-              <p className="text-xs text-ink-500 mt-2">
+              <p className="text-xs text-soft-400 mt-2">
                 Only verified companies enable instant email verification
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">
+              <label className="block text-sm font-medium text-soft-500 mb-2">
                 Email Domain
               </label>
               <input
@@ -249,15 +249,15 @@ export default function EditCompanyPage({ params }: { params: { id: string } }) 
                 value={emailDomain}
                 onChange={(e) => setEmailDomain(e.target.value.toLowerCase())}
                 placeholder="example.com"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
               />
-              <p className="text-xs text-ink-500 mt-2">
+              <p className="text-xs text-soft-400 mt-2">
                 Workers with emails from this domain can instantly verify positions
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">
+              <label className="block text-sm font-medium text-soft-500 mb-2">
                 HR Email
               </label>
               <input
@@ -265,9 +265,9 @@ export default function EditCompanyPage({ params }: { params: { id: string } }) 
                 value={hrEmail}
                 onChange={(e) => setHrEmail(e.target.value)}
                 placeholder="hr@example.com"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-4 py-3 bg-white border border-soft-200 rounded-xl text-navy-600 placeholder:text-soft-400 focus:outline-none focus:ring-2 focus:ring-navy-500"
               />
-              <p className="text-xs text-ink-500 mt-2">
+              <p className="text-xs text-soft-400 mt-2">
                 Verification requests will be sent to this email
               </p>
             </div>
@@ -279,14 +279,14 @@ export default function EditCompanyPage({ params }: { params: { id: string } }) 
           <button
             type="button"
             onClick={() => router.back()}
-            className="flex-1 bg-white/5 hover:bg-white/10 text-white py-3 rounded-xl font-semibold transition-all"
+            className="flex-1 bg-white hover:bg-soft-100 text-navy-600 py-3 rounded-xl font-semibold transition-all"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={saving || !name}
-            className="flex-1 bg-brand-600 hover:bg-brand-500 disabled:bg-ink-700 disabled:text-ink-500 text-white py-3 rounded-xl font-semibold transition-all"
+            className="flex-1 bg-navy-600 hover:bg-navy-500 disabled:bg-soft-300 disabled:text-soft-400 text-navy-600 py-3 rounded-xl font-semibold transition-all"
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </button>

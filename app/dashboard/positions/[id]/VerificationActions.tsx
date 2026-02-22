@@ -142,7 +142,7 @@ export default function VerificationActions({
             <button
               onClick={handleResendVerification}
               disabled={loading}
-              className="bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all flex items-center gap-2"
+              className="bg-navy-600 hover:bg-navy-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all flex items-center gap-2"
             >
               {loading ? (
                 <>
@@ -160,7 +160,7 @@ export default function VerificationActions({
           {/* Correct Info button */}
           <button
             onClick={() => setShowCorrectForm(true)}
-            className="bg-white/10 hover:bg-white/15 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all flex items-center gap-2"
+            className="bg-soft-100 hover:bg-soft-200 text-navy-600 px-5 py-2.5 rounded-lg font-semibold text-sm transition-all flex items-center gap-2"
           >
             ✏️ Correct &amp; Resubmit
           </button>
@@ -170,7 +170,7 @@ export default function VerificationActions({
             <button
               onClick={handleSubmitForVerification}
               disabled={loading}
-              className="bg-yellow-600 hover:bg-yellow-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all flex items-center gap-2"
+              className="bg-yellow-600 hover:bg-yellow-500 disabled:opacity-50 text-navy-600 px-5 py-2.5 rounded-lg font-semibold text-sm transition-all flex items-center gap-2"
             >
               🔍 Submit Company for Verification
             </button>
@@ -179,14 +179,14 @@ export default function VerificationActions({
       ) : (
         /* Correction Form */
         <form onSubmit={handleUpdateAndResend} className="space-y-4">
-          <div className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-4">
-            <h3 className="text-white font-semibold text-sm">Update Verification Info</h3>
+          <div className="bg-white border border-soft-200 rounded-lg p-4 space-y-4">
+            <h3 className="text-navy-600 font-semibold text-sm">Update Verification Info</h3>
 
             <div>
-              <label className="block text-sm text-ink-400 mb-1">
+              <label className="block text-sm text-soft-500 mb-1">
                 Your Work Email
                 {companyEmailDomain && (
-                  <span className="text-ink-500 ml-1">(must be @{companyEmailDomain})</span>
+                  <span className="text-soft-400 ml-1">(must be @{companyEmailDomain})</span>
                 )}
               </label>
               <input
@@ -194,12 +194,12 @@ export default function VerificationActions({
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
                 placeholder="you@company.com"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-ink-500 focus:outline-none focus:border-brand-500 transition-colors"
+                className="w-full bg-white border border-soft-200 rounded-lg px-4 py-2.5 text-navy-600 placeholder:text-soft-400 focus:outline-none focus:border-navy-500 transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-sm text-ink-400 mb-1">
+              <label className="block text-sm text-soft-500 mb-1">
                 HR / Manager Email
               </label>
               <input
@@ -207,7 +207,7 @@ export default function VerificationActions({
                 value={newHrEmail}
                 onChange={(e) => setNewHrEmail(e.target.value)}
                 placeholder="hr@company.com"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-ink-500 focus:outline-none focus:border-brand-500 transition-colors"
+                className="w-full bg-white border border-soft-200 rounded-lg px-4 py-2.5 text-navy-600 placeholder:text-soft-400 focus:outline-none focus:border-navy-500 transition-colors"
               />
             </div>
           </div>
@@ -216,7 +216,7 @@ export default function VerificationActions({
             <button
               type="submit"
               disabled={loading || (!newEmail && !newHrEmail)}
-              className="bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all flex items-center gap-2"
+              className="bg-navy-600 hover:bg-navy-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all flex items-center gap-2"
             >
               {loading ? (
                 <>
@@ -235,7 +235,7 @@ export default function VerificationActions({
                 setShowCorrectForm(false)
                 setMessage(null)
               }}
-              className="bg-white/10 hover:bg-white/15 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all"
+              className="bg-soft-100 hover:bg-soft-200 text-navy-600 px-5 py-2.5 rounded-lg font-semibold text-sm transition-all"
             >
               Cancel
             </button>
