@@ -49,7 +49,7 @@ export default function PositionManagement({
       })
 
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to update')
+      if (!res.ok) throw new Error(data.error || `Update failed (${res.status})`)
 
       setMessage({ type: 'success', text: 'Position updated!' })
       setShowEdit(false)
@@ -73,7 +73,7 @@ export default function PositionManagement({
       })
 
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to update')
+      if (!res.ok) throw new Error(data.error || `Toggle failed (${res.status})`)
 
       setMessage({
         type: 'success',
@@ -96,15 +96,22 @@ export default function PositionManagement({
         method: 'DELETE',
       })
 
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to delete')
+      const text = await res.text()
+      let data
+      try {
+        data = JSON.parse(text)
+      } catch {
+        throw new Error(`Server returned: ${text.slice(0, 200)}`)
+      }
 
-      router.push('/dashboard/positions')
-      router.refresh()
+      if (!res.ok) {
+        throw new Error(data.error || `Delete failed (${res.status})`)
+      }
+
+      // Navigate away after successful delete
+      window.location.href = '/dashboard/positions'
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message })
-      setShowDeleteConfirm(false)
-    } finally {
       setLoading(false)
     }
   }
@@ -137,7 +144,7 @@ export default function PositionManagement({
             disabled={loading}
             className="bg-white/10 hover:bg-white/15 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
           >
-            {isActive ? '👁️‍🗨️ Hide Position' : '👁️ Show Position'}
+            {loading ? 'Updating...' : isActive ? '👁️‍🗨️ Hide Position' : '👁️ Show Position'}
           </button>
 
           <button
@@ -211,10 +218,7 @@ export default function PositionManagement({
             </button>
             <button
               type="button"
-              onClick={() => {
-                setShowEdit(false)
-                setMessage(null)
-              }}
+              onClick={() => { setShowEdit(false); setMessage(null) }}
               className="bg-white/10 hover:bg-white/15 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all"
             >
               Cancel
@@ -241,10 +245,8 @@ export default function PositionManagement({
               {loading ? 'Deleting...' : 'Yes, Delete Permanently'}
             </button>
             <button
-              onClick={() => {
-                setShowDeleteConfirm(false)
-                setMessage(null)
-              }}
+              onClick={() => { setShowDeleteConfirm(false); setMessage(null) }}
+              disabled={loading}
               className="bg-white/10 hover:bg-white/15 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all"
             >
               Cancel
