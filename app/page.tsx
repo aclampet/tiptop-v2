@@ -31,7 +31,7 @@ export default function HomePage() {
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link href="/signup" className="bg-navy-600 hover:bg-navy-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors">
-              Get Your QR Code
+              Build Now
             </Link>
             <Link href="/login" className="border-2 border-navy-600 text-navy-600 hover:bg-navy-600 hover:text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors">
               Sign In
@@ -92,7 +92,7 @@ export default function HomePage() {
           <h2 className="font-display text-3xl text-white mb-4">Start building your reputation today</h2>
           <p className="text-navy-200 mb-10">Free to sign up. Free to use. Your reputation is priceless.</p>
           <Link href="/signup" className="inline-block bg-gold-300 hover:bg-gold-400 text-navy-600 px-10 py-4 rounded-lg font-bold text-lg transition-colors">
-            Get Your QR Code →
+            Build Now →
           </Link>
         </div>
       </section>
