@@ -6,30 +6,30 @@ export default function HomePage() {
     <div className="min-h-screen bg-white">
       {/* Nav — Navy */}
       <nav className="bg-navy-600">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
           <Logo size="sm" />
-          <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm text-white/80 hover:text-white transition-colors">Sign In</Link>
-            <Link href="/signup" className="bg-gold-300 hover:bg-gold-400 text-navy-600 px-5 py-2 rounded-lg text-sm font-semibold transition-colors">Get Started</Link>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Link href="/login" className="text-sm text-white/80 hover:text-white transition-colors hidden sm:block">Sign In</Link>
+            <Link href="/signup" className="bg-gold-300 hover:bg-gold-400 text-navy-600 px-4 sm:px-5 py-2 rounded-lg text-sm font-semibold transition-colors">Get Started</Link>
           </div>
         </div>
       </nav>
 
       {/* Hero — White */}
-      <section className="py-24 px-6">
+      <section className="py-12 sm:py-24 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="font-display text-5xl md:text-6xl text-navy-600 mb-6 leading-tight">
+          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl text-navy-600 mb-4 sm:mb-6 leading-tight">
             Build a{' '}
             <span className="relative inline-block">
               reputation
-              <span className="absolute bottom-1 left-0 w-full h-2 bg-gold-300/40 -z-10 rounded" />
+              <span className="absolute bottom-0.5 sm:bottom-1 left-0 w-full h-1.5 sm:h-2 bg-gold-300/40 -z-10 rounded" />
             </span>{' '}
             that follows you
           </h1>
-          <p className="text-lg text-soft-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-base sm:text-lg text-soft-500 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">
             TipTop gives service workers a portable professional profile. Collect verified reviews across every job — they travel with you, not your employer.
           </p>
-          <div className="flex gap-4 justify-center flex-wrap">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             <Link href="/signup" className="bg-gold-300 hover:bg-gold-400 text-navy-600 px-8 py-4 rounded-lg font-semibold text-lg transition-colors">
               Build Now
             </Link>
@@ -41,10 +41,10 @@ export default function HomePage() {
       </section>
 
       {/* How It Works — Soft Gray */}
-      <section className="bg-soft-100 py-20 px-6">
+      <section className="bg-soft-100 py-12 sm:py-20 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
-          <h2 className="font-display text-3xl text-navy-600 text-center mb-16">How TipTop Works</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <h2 className="font-display text-2xl sm:text-3xl text-navy-600 text-center mb-10 sm:mb-16">How TipTop Works</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
             {[
               { n: '1', t: 'Add Your Position', d: 'Enter your company and job title. We verify your employment through email or HR approval.' },
               { n: '2', t: 'Share Your QR Code', d: 'Print it, display it, or share the link. Customers scan to leave a review in seconds.' },
@@ -61,10 +61,10 @@ export default function HomePage() {
       </section>
 
       {/* Features — White */}
-      <section className="py-20 px-6">
+      <section className="py-12 sm:py-20 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
-          <h2 className="font-display text-3xl text-navy-600 text-center mb-4">Built for Service Workers</h2>
-          <p className="text-soft-500 text-center mb-16 max-w-2xl mx-auto">
+          <h2 className="font-display text-2xl sm:text-3xl text-navy-600 text-center mb-4">Built for Service Workers</h2>
+          <p className="text-soft-500 text-center mb-10 sm:mb-16 max-w-2xl mx-auto">
             Whether you&apos;re a bartender, barber, contractor, or concierge — your reputation matters.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -87,10 +87,10 @@ export default function HomePage() {
       </section>
 
       {/* CTA — Navy */}
-      <section className="bg-navy-600 py-20 px-6">
+      <section className="bg-navy-600 py-12 sm:py-20 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="font-display text-3xl text-white mb-4">Start building your reputation today</h2>
-          <p className="text-navy-200 mb-10">Free to sign up. Free to use. Your reputation is priceless.</p>
+          <h2 className="font-display text-2xl sm:text-3xl text-white mb-4">Start building your reputation today</h2>
+          <p className="text-navy-200 mb-8 sm:mb-10">Free to sign up. Free to use. Your reputation is priceless.</p>
           <Link href="/signup" className="inline-block bg-gold-300 hover:bg-gold-400 text-navy-600 px-10 py-4 rounded-lg font-bold text-lg transition-colors">
             Build Now →
           </Link>
@@ -98,8 +98,8 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-navy-700 py-10 px-6">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
+      <footer className="bg-navy-700 py-8 sm:py-10 px-4 sm:px-6">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div>
             <Logo size="sm" />
             <p className="text-navy-200 text-sm mt-1">Your reputation follows you!</p>
