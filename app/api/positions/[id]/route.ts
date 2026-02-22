@@ -87,50 +87,59 @@ export async function PATCH(
 // DELETE /api/positions/[id] — Delete position and associated data
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
-  const positionId = params.id
-  console.log('DELETE position request:', positionId)
+  try {
+    const { id: positionId } = context.params
+    console.log('DELETE position request:', positionId)
 
-  const result = await verifyOwnership(request, positionId)
-  if ('error' in result && result.error) return result.error
+    if (!positionId) {
+      return NextResponse.json({ error: 'Position ID is required' }, { status: 400 })
+    }
 
-  const { admin } = result as { admin: Awaited<ReturnType<typeof createAdminClient>>; worker: any; user: any }
+    const result = await verifyOwnership(request, positionId)
+    if ('error' in result && result.error) return result.error
 
-  // Delete in order: reviews → qr_tokens → position (cascade should handle this,
-  // but be explicit for safety)
-  const { error: reviewsError } = await admin
-    .from('reviews')
-    .delete()
-    .eq('position_id', positionId)
+    const { admin } = result as { admin: Awaited<ReturnType<typeof createAdminClient>>; worker: any; user: any }
 
-  if (reviewsError) {
-    console.error('Error deleting reviews:', reviewsError)
-    return NextResponse.json({ error: 'Failed to delete associated reviews' }, { status: 500 })
+    // Delete in order: reviews → qr_tokens → position (cascade should handle this,
+    // but be explicit for safety)
+    const { error: reviewsError } = await admin
+      .from('reviews')
+      .delete()
+      .eq('position_id', positionId)
+
+    if (reviewsError) {
+      console.error('Error deleting reviews:', reviewsError)
+      return NextResponse.json({ error: 'Failed to delete associated reviews' }, { status: 500 })
+    }
+    console.log('Deleted reviews for position:', positionId)
+
+    const { error: tokensError } = await admin
+      .from('qr_tokens')
+      .delete()
+      .eq('position_id', positionId)
+
+    if (tokensError) {
+      console.error('Error deleting QR tokens:', tokensError)
+      return NextResponse.json({ error: 'Failed to delete associated QR tokens' }, { status: 500 })
+    }
+    console.log('Deleted QR tokens for position:', positionId)
+
+    const { error: positionError } = await admin
+      .from('positions')
+      .delete()
+      .eq('id', positionId)
+
+    if (positionError) {
+      console.error('Error deleting position:', positionError)
+      return NextResponse.json({ error: 'Failed to delete position' }, { status: 500 })
+    }
+
+    console.log('Position deleted successfully:', positionId)
+    return NextResponse.json({ success: true, message: 'Position deleted' })
+  } catch (err: any) {
+    console.error('Unexpected error in DELETE:', err)
+    return NextResponse.json({ error: err.message || 'Unexpected error' }, { status: 500 })
   }
-  console.log('Deleted reviews for position:', positionId)
-
-  const { error: tokensError } = await admin
-    .from('qr_tokens')
-    .delete()
-    .eq('position_id', positionId)
-
-  if (tokensError) {
-    console.error('Error deleting QR tokens:', tokensError)
-    return NextResponse.json({ error: 'Failed to delete associated QR tokens' }, { status: 500 })
-  }
-  console.log('Deleted QR tokens for position:', positionId)
-
-  const { error: positionError } = await admin
-    .from('positions')
-    .delete()
-    .eq('id', positionId)
-
-  if (positionError) {
-    console.error('Error deleting position:', positionError)
-    return NextResponse.json({ error: 'Failed to delete position' }, { status: 500 })
-  }
-
-  console.log('Position deleted successfully:', positionId)
-  return NextResponse.json({ success: true, message: 'Position deleted' })
 }
