@@ -4,7 +4,7 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'TipTop.review',
-  description: 'Build your professional reputation once, carry it everywhere',
+  description: 'Your reputation follows you!',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

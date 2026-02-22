@@ -56,7 +56,7 @@ export async function sendWelcomeEmail({
         <p><a href="${APP_URL}/dashboard" style="background: #0d9488; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">Get Started</a></p>
         <hr style="margin: 40px 0; border: none; border-top: 1px solid #e5e7eb;">
         <p style="color: #6b7280; font-size: 14px;">
-          TipTop.review — Your reputation travels with you.
+          TipTop.review — Your reputation follows you!
         </p>
       `,
     })
@@ -106,7 +106,7 @@ export async function sendNewReviewEmail({
         <p><a href="${APP_URL}/dashboard/reviews" style="background: #0d9488; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">View All Reviews</a></p>
         <hr style="margin: 40px 0; border: none; border-top: 1px solid #e5e7eb;">
         <p style="color: #6b7280; font-size: 14px;">
-          TipTop.review — Your reputation travels with you.
+          TipTop.review — Your reputation follows you!
         </p>
       `,
     })
@@ -157,7 +157,7 @@ export async function sendPositionVerificationEmail({
         </p>
         <hr style="margin: 40px 0; border: none; border-top: 1px solid #e5e7eb;">
         <p style="color: #6b7280; font-size: 14px;">
-          TipTop.review — Your reputation travels with you.
+          TipTop.review — Your reputation follows you!
         </p>
       `,
     })
@@ -252,7 +252,7 @@ export async function sendCompanyVerificationConfirmation({
         <p>Once verified, your employees will be able to instantly verify their positions using their company email addresses.</p>
         <hr style="margin: 40px 0; border: none; border-top: 1px solid #e5e7eb;">
         <p style="color: #6b7280; font-size: 14px;">
-          TipTop.review — Your reputation travels with you.
+          TipTop.review — Your reputation follows you!
         </p>
       `,
     })
@@ -332,7 +332,7 @@ export async function sendVerificationApproved({
         <p>Your employees can now add positions at your company and start building their professional reputations.</p>
         <hr style="margin: 40px 0; border: none; border-top: 1px solid #e5e7eb;">
         <p style="color: #6b7280; font-size: 14px;">
-          TipTop.review — Your reputation travels with you.
+          TipTop.review — Your reputation follows you!
         </p>
       `,
     })
@@ -373,7 +373,7 @@ export async function sendVerificationDenied({
         <p>If you have questions or would like to provide additional information, please reply to this email.</p>
         <hr style="margin: 40px 0; border: none; border-top: 1px solid #e5e7eb;">
         <p style="color: #6b7280; font-size: 14px;">
-          TipTop.review — Your reputation travels with you.
+          TipTop.review — Your reputation follows you!
         </p>
       `,
     })

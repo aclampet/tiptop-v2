@@ -102,7 +102,7 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div>
             <Logo size="sm" />
-            <p className="text-navy-200 text-sm mt-1">Portable professional reputation</p>
+            <p className="text-navy-200 text-sm mt-1">Your reputation follows you!</p>
           </div>
           <p className="text-navy-300 text-sm">&copy; {new Date().getFullYear()} TipTop.review</p>
         </div>
