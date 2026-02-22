@@ -30,7 +30,7 @@ export default function HomePage() {
             TipTop gives service workers a portable professional profile. Collect verified reviews across every job — they travel with you, not your employer.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
-            <Link href="/signup" className="bg-navy-600 hover:bg-navy-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors">
+            <Link href="/signup" className="bg-gold-300 hover:bg-gold-400 text-navy-600 px-8 py-4 rounded-lg font-semibold text-lg transition-colors">
               Build Now
             </Link>
             <Link href="/login" className="border-2 border-navy-600 text-navy-600 hover:bg-navy-600 hover:text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors">
