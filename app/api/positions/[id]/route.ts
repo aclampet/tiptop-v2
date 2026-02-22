@@ -99,29 +99,27 @@ export async function DELETE(
 
   // Delete in order: reviews → qr_tokens → position (cascade should handle this,
   // but be explicit for safety)
-  const { error: reviewsError, count: reviewsDeleted } = await admin
+  const { error: reviewsError } = await admin
     .from('reviews')
     .delete()
     .eq('position_id', positionId)
-    .select('id', { count: 'exact', head: true })
 
   if (reviewsError) {
     console.error('Error deleting reviews:', reviewsError)
     return NextResponse.json({ error: 'Failed to delete associated reviews' }, { status: 500 })
   }
-  console.log('Deleted reviews:', reviewsDeleted)
+  console.log('Deleted reviews for position:', positionId)
 
-  const { error: tokensError, count: tokensDeleted } = await admin
+  const { error: tokensError } = await admin
     .from('qr_tokens')
     .delete()
     .eq('position_id', positionId)
-    .select('id', { count: 'exact', head: true })
 
   if (tokensError) {
     console.error('Error deleting QR tokens:', tokensError)
     return NextResponse.json({ error: 'Failed to delete associated QR tokens' }, { status: 500 })
   }
-  console.log('Deleted QR tokens:', tokensDeleted)
+  console.log('Deleted QR tokens for position:', positionId)
 
   const { error: positionError } = await admin
     .from('positions')
