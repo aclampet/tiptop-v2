@@ -16,14 +16,14 @@ async function isAdmin(userId: string, admin: any): Promise<boolean> {
 
 // GET /api/admin/verifications - List all verification requests
 export async function GET(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
   
   // Check admin role
   if (!(await isAdmin(user.id, admin))) {
@@ -38,8 +38,7 @@ export async function GET(request: NextRequest) {
     .from('company_verification_requests')
     .select(`
       *,
-      company:companies (*),
-      submitted_by_user:auth.users!submitted_by (email)
+      company:companies (*)
     `)
     .eq('status', status)
     .order('created_at', { ascending: false })
@@ -56,14 +55,14 @@ export async function GET(request: NextRequest) {
 
 // PATCH /api/admin/verifications/[id] - Review verification request
 export async function PATCH(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
   
   // Check admin role
   if (!(await isAdmin(user.id, admin))) {

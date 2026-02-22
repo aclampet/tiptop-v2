@@ -5,7 +5,7 @@ import { createAdminClient } from '@/supabase/server'
  * This is called after a new review is submitted
  */
 export async function checkBadgeEligibility(workerId: string): Promise<void> {
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   // Get worker stats
   const { data: worker } = await admin

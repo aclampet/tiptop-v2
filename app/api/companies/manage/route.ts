@@ -3,7 +3,7 @@ import { createClient, createAdminClient } from '@/supabase/server'
 
 // GET /api/companies/manage?slug=xxx — Load company for management (verify ownership)
 export async function GET(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
 
   if (authError || !user) {
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Company slug required' }, { status: 400 })
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   // Get company
   const { data: company } = await admin
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 
 // PATCH /api/companies/manage — Update company profile
 export async function PATCH(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
 
   if (authError || !user) {
@@ -61,7 +61,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Company ID required' }, { status: 400 })
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   // Verify ownership
   const { data: company } = await admin

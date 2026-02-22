@@ -4,7 +4,7 @@ import Link from 'next/link'
 export const dynamic = 'force-dynamic'
 
 export default async function AdminDashboardPage() {
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   // Get system stats
   const [
@@ -69,7 +69,7 @@ export default async function AdminDashboardPage() {
               </p>
               <Link
                 href="/admin/verifications"
-                className="inline-block bg-yellow-600 hover:bg-yellow-500 text-navy-600 px-6 py-3 rounded-lg font-semibold transition-all"
+                className="inline-block bg-yellow-600 hover:bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold transition-all"
               >
                 Review Requests
               </Link>

@@ -6,8 +6,8 @@ import { formatRating, formatDateRange, getDurationMonths, formatDuration } from
 export const dynamic = 'force-dynamic'
 
 export default async function PositionsPage() {
-  const supabase = createClient()
-  const admin = createAdminClient()
+  const supabase = await createClient()
+  const admin = await createAdminClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -46,7 +46,7 @@ export default async function PositionsPage() {
         </div>
         <Link
           href="/dashboard/positions/new"
-          className="bg-navy-600 hover:bg-navy-500 text-navy-600 px-6 py-3 rounded-lg font-semibold transition-all"
+          className="bg-navy-600 hover:bg-navy-500 text-white px-6 py-3 rounded-lg font-semibold transition-all"
         >
           + Add Position
         </Link>
@@ -64,7 +64,7 @@ export default async function PositionsPage() {
           </p>
           <Link
             href="/dashboard/positions/new"
-            className="inline-block bg-navy-600 hover:bg-navy-500 text-navy-600 px-8 py-4 rounded-lg font-semibold transition-all"
+            className="inline-block bg-navy-600 hover:bg-navy-500 text-white px-8 py-4 rounded-lg font-semibold transition-all"
           >
             Add Your First Position
           </Link>

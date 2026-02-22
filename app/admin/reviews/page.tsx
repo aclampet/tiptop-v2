@@ -3,7 +3,7 @@ import { createAdminClient } from '@/supabase/server'
 export const dynamic = 'force-dynamic'
 
 export default async function AdminReviewsPage() {
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   const { data: reviews } = await admin
     .from('reviews')

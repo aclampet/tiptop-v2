@@ -16,14 +16,14 @@ async function isAdmin(userId: string, admin: any): Promise<boolean> {
 
 // GET /api/admin/companies - List all companies with stats
 export async function GET(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
   
   // Check admin role
   if (!(await isAdmin(user.id, admin))) {
@@ -64,8 +64,8 @@ export async function GET(request: NextRequest) {
 
       const positionCount = positions?.length || 0
       const totalReviews = positions?.reduce((sum, p) => sum + p.review_count, 0) || 0
-      const avgRating = positions?.length 
-        ? positions.reduce((sum, p) => sum + (p.rating * p.review_count), 0) / totalReviews
+      const avgRating = totalReviews > 0
+        ? positions!.reduce((sum, p) => sum + (p.rating * p.review_count), 0) / totalReviews
         : 0
 
       return {
@@ -88,14 +88,14 @@ export async function GET(request: NextRequest) {
 
 // POST /api/admin/companies - Create verified company (admin only)
 export async function POST(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
   
   // Check admin role
   if (!(await isAdmin(user.id, admin))) {
@@ -149,55 +149,4 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ company })
-}
-
-// PATCH /api/admin/companies/[id] - Update company (admin only)
-export async function PATCH(request: NextRequest) {
-  const supabase = createClient()
-  
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const admin = createAdminClient()
-  
-  // Check admin role
-  if (!(await isAdmin(user.id, admin))) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
-
-  const url = new URL(request.url)
-  const companyId = url.pathname.split('/').pop()
-
-  if (!companyId) {
-    return NextResponse.json({ error: 'Company ID required' }, { status: 400 })
-  }
-
-  const body = await request.json()
-
-  // If changing verification status to verified, set verified_by and verified_at
-  if (body.verification_status === 'verified') {
-    body.verified_by = user.id
-    body.verified_at = new Date().toISOString()
-  }
-
-  // Ensure email_domain is lowercase if provided
-  if (body.email_domain) {
-    body.email_domain = body.email_domain.toLowerCase()
-  }
-
-  const { data: updated, error: updateError } = await admin
-    .from('companies')
-    .update(body)
-    .eq('id', companyId)
-    .select()
-    .single()
-
-  if (updateError) {
-    console.error('Error updating company:', updateError)
-    return NextResponse.json({ error: 'Failed to update company' }, { status: 500 })
-  }
-
-  return NextResponse.json({ company: updated })
 }

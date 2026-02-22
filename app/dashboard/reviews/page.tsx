@@ -5,8 +5,8 @@ import { formatDate } from '@/lib/utils'
 export const dynamic = 'force-dynamic'
 
 export default async function ReviewsPage() {
-  const supabase = createClient()
-  const admin = createAdminClient()
+  const supabase = await createClient()
+  const admin = await createAdminClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -103,7 +103,7 @@ export default async function ReviewsPage() {
           </p>
           <a
             href="/dashboard/qr"
-            className="inline-block bg-navy-600 hover:bg-navy-500 text-navy-600 px-8 py-4 rounded-lg font-semibold transition-all"
+            className="inline-block bg-navy-600 hover:bg-navy-500 text-white px-8 py-4 rounded-lg font-semibold transition-all"
           >
             View QR Codes
           </a>

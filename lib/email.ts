@@ -1,4 +1,5 @@
 import { Resend } from 'resend'
+import { generateVerificationToken } from './utils'
 
 // Lazy-initialize Resend to avoid build-time errors
 let resendInstance: Resend | null = null
@@ -137,7 +138,8 @@ export async function sendPositionVerificationEmail({
   const resend = getResend()
   if (!resend) return
 
-  const verificationUrl = `${APP_URL}/verify-position?id=${positionId}&token=${positionId}`
+  const token = generateVerificationToken(positionId)
+  const verificationUrl = `${APP_URL}/verify-position?id=${positionId}&token=${encodeURIComponent(token)}`
 
   try {
     await resend.emails.send({
@@ -185,8 +187,9 @@ export async function sendHRApprovalRequest({
   const resend = getResend()
   if (!resend) return
 
-  const approveUrl = `${APP_URL}/hr/approve?id=${positionId}&token=${positionId}&action=approve`
-  const denyUrl = `${APP_URL}/hr/approve?id=${positionId}&token=${positionId}&action=deny`
+  const token = generateVerificationToken(positionId)
+  const approveUrl = `${APP_URL}/hr/approve?id=${positionId}&token=${encodeURIComponent(token)}&action=approve`
+  const denyUrl = `${APP_URL}/hr/approve?id=${positionId}&token=${encodeURIComponent(token)}&action=deny`
 
   try {
     await resend.emails.send({

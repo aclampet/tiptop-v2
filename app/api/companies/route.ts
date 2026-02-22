@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Query parameter required' }, { status: 400 })
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   // Search companies by name (case-insensitive, partial match)
   const { data: companies, error } = await admin
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/companies - Create new company
 export async function POST(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Company name required' }, { status: 400 })
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
   const companySlug = slugify(body.name)
 
   // Check if company with same slug exists
@@ -98,24 +98,23 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({ company })
 }
 
-// PATCH /api/companies/[id] - Update company
+// PATCH /api/companies - Update company (requires company_id in body)
 export async function PATCH(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const url = new URL(request.url)
-  const companyId = url.pathname.split('/').pop()
+  const body: UpdateCompanyRequest & { company_id?: string } = await request.json()
+  const { company_id: companyId, ...updates } = body
 
   if (!companyId) {
-    return NextResponse.json({ error: 'Company ID required' }, { status: 400 })
+    return NextResponse.json({ error: 'Company ID required in request body' }, { status: 400 })
   }
 
-  const body: UpdateCompanyRequest = await request.json()
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   // Verify ownership or admin role
   const { data: company } = await admin
@@ -128,15 +127,22 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Company not found' }, { status: 404 })
   }
 
-  if (company.created_by !== user.id) {
-    // TODO: Check if user is admin
+  // Check ownership or admin role
+  const { data: userRole } = await admin
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', user.id)
+    .eq('role', 'admin')
+    .single()
+
+  if (company.created_by !== user.id && !userRole) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   }
 
   // Update company
   const { data: updated, error: updateError } = await admin
     .from('companies')
-    .update(body)
+    .update(updates)
     .eq('id', companyId)
     .select()
     .single()

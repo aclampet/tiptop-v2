@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Position ID required' }, { status: 400 })
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
   const offset = (page - 1) * limit
 
   // Get reviews for this position
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     }, { status: 400 })
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   // Get QR token and verify it's active
   const { data: token, error: tokenError } = await admin
@@ -150,11 +150,8 @@ export async function POST(request: NextRequest) {
   // Update rate limit
   rateLimitStore.set(rateLimitKey, now)
 
-  // Update QR token scan count (fire and forget)
-  void admin
-    .from('qr_tokens')
-    .update({ scan_count: (token.scan_count || 0) + 1 })
-    .eq('id', qr_token_id)
+  // Note: scan_count is already incremented when QR is scanned (in worker route)
+  // No need to increment again here
 
   // Position rating is updated automatically by trigger
   // Worker overall rating is updated automatically by trigger

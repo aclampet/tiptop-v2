@@ -7,7 +7,6 @@ import Link from 'next/link'
 
 export default function LoginPage() {
   const router = useRouter()
-  const supabase = createClient()
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -20,6 +19,7 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
+      const supabase = createClient()
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,

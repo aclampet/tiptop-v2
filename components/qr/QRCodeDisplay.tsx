@@ -116,7 +116,7 @@ export default function QRCodeDisplay({ token, position, isActive }: QRCodeDispl
         <button
           onClick={handleDownload}
           disabled={!isActive}
-          className="w-full bg-navy-600 hover:bg-navy-500 disabled:bg-soft-300 disabled:text-soft-400 text-navy-600 py-3 rounded-lg font-semibold transition-all"
+          className="w-full bg-navy-600 hover:bg-navy-500 disabled:bg-soft-300 disabled:text-soft-400 text-white py-3 rounded-lg font-semibold transition-all"
         >
           📥 Download PNG
         </button>

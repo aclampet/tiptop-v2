@@ -8,7 +8,6 @@ import Link from 'next/link'
 
 export default function SignupPage() {
   const router = useRouter()
-  const supabase = createClient()
 
   const [step, setStep] = useState<1 | 2>(1)
   const [loading, setLoading] = useState(false)
@@ -27,6 +26,7 @@ export default function SignupPage() {
     setLoading(true)
 
     try {
+      const supabase = createClient()
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,

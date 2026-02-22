@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/supabase/server'
+import { verifyVerificationToken } from '@/lib/utils'
 
 // POST /api/positions/[id]/hr-approve
 // Called when HR clicks approve link in email
@@ -22,12 +23,11 @@ export async function POST(
     }, { status: 400 })
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
-  // Verify token (in production, validate JWT with HR email)
-  // For now, simple approach where token = position_id
-  if (token !== positionId) {
-    return NextResponse.json({ error: 'Invalid token' }, { status: 400 })
+  // Verify token signature and expiration
+  if (!verifyVerificationToken(token, positionId)) {
+    return NextResponse.json({ error: 'Invalid or expired token' }, { status: 400 })
   }
 
   // Get position

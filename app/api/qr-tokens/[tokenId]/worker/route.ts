@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: { tokenId: string } }
 ) {
   const { tokenId } = params
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   const { data: token, error: tokenError } = await admin
     .from('qr_tokens')
@@ -56,10 +56,16 @@ export async function GET(
   const worker = position.worker as any
   const company = position.company as any
 
-  void admin
+  // Increment scan count (fire-and-forget for performance)
+  // Note: For high-traffic scenarios, consider using a database function 
+  // for atomic increment to prevent race conditions
+  admin
     .from('qr_tokens')
     .update({ scan_count: (token.scan_count || 0) + 1 })
     .eq('id', tokenId)
+    .then(({ error }) => {
+      if (error) console.error('Failed to update scan count:', error)
+    })
 
   return NextResponse.json({ 
     token: {

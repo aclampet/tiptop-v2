@@ -8,7 +8,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   const { id: positionId } = params
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // Authenticate user
   const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -16,7 +16,7 @@ export async function POST(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   // Get worker
   const { data: worker } = await admin

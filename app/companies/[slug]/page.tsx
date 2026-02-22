@@ -4,7 +4,7 @@ import { formatRating } from '@/lib/utils'
 import Link from 'next/link'
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
   
   const { data: company } = await admin
     .from('companies')
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function CompanyProfilePage({ params }: { params: { slug: string } }) {
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   // Get company with positions and worker details
   const { data: company } = await admin

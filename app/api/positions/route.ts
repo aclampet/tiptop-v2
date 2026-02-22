@@ -6,14 +6,14 @@ import type { CreatePositionRequest } from '@/types'
 
 // GET /api/positions - Get all positions for authenticated worker
 export async function GET(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
   
   // Get worker
   const { data: worker } = await admin
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/positions - Create new position
 export async function POST(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body: CreatePositionRequest = await request.json()
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   // Get worker
   const { data: worker } = await admin

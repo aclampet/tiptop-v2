@@ -19,7 +19,8 @@ export function slugify(text: string): string {
 /**
  * Format rating to 1 decimal place
  */
-export function formatRating(rating: number): string {
+export function formatRating(rating: number | null | undefined): string {
+  if (rating == null) return '0.0'
   return rating.toFixed(1)
 }
 
@@ -174,20 +175,46 @@ export function getVerificationBadgeColor(
 
 /**
  * Generate verification token (for email links)
- * In production, use JWT or signed tokens
+ * Creates a signed token with position ID and timestamp
  */
 export function generateVerificationToken(positionId: string): string {
-  // Simple approach for MVP - just use position ID
-  // In production, use JWT with expiration
-  return positionId
+  const timestamp = Date.now()
+  const data = `${positionId}:${timestamp}`
+  const signature = crypto.createHmac('sha256', getTokenSecret())
+    .update(data)
+    .digest('hex')
+    .slice(0, 16)
+  return Buffer.from(`${data}:${signature}`).toString('base64url')
 }
 
 /**
  * Verify email verification token
+ * Validates signature and checks token is not older than 7 days
  */
 export function verifyVerificationToken(token: string, positionId: string): boolean {
-  // Simple approach for MVP
-  return token === positionId
+  try {
+    const decoded = Buffer.from(token, 'base64url').toString()
+    const [tokenPositionId, timestampStr, signature] = decoded.split(':')
+    
+    if (tokenPositionId !== positionId) return false
+    
+    const timestamp = parseInt(timestampStr, 10)
+    const maxAge = 7 * 24 * 60 * 60 * 1000 // 7 days
+    if (Date.now() - timestamp > maxAge) return false
+    
+    const expectedSignature = crypto.createHmac('sha256', getTokenSecret())
+      .update(`${tokenPositionId}:${timestampStr}`)
+      .digest('hex')
+      .slice(0, 16)
+    
+    return signature === expectedSignature
+  } catch {
+    return false
+  }
+}
+
+function getTokenSecret(): string {
+  return process.env.SUPABASE_SERVICE_ROLE_KEY || 'fallback-dev-secret'
 }
 
 /**

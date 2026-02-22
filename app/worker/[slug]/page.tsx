@@ -3,7 +3,7 @@ import { createAdminClient } from '@/supabase/server'
 import { formatRating, formatDateRange, getDurationMonths, formatDuration } from '@/lib/utils'
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
   
   const { data: worker } = await admin
     .from('workers')
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function WorkerProfilePage({ params }: { params: { slug: string } }) {
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   // Get worker with all positions and reviews
   const { data: worker } = await admin

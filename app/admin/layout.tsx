@@ -9,7 +9,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { data: { user }, error } = await supabase.auth.getUser()
 
@@ -18,7 +18,7 @@ export default async function AdminLayout({
   }
 
   // Check if user is admin
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
   const { data: userRole } = await admin
     .from('user_roles')
     .select('role')

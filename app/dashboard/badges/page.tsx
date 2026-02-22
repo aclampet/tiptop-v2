@@ -4,8 +4,8 @@ import { createClient, createAdminClient } from '@/supabase/server'
 export const dynamic = 'force-dynamic'
 
 export default async function BadgesPage() {
-  const supabase = createClient()
-  const admin = createAdminClient()
+  const supabase = await createClient()
+  const admin = await createAdminClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')

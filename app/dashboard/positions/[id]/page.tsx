@@ -12,8 +12,8 @@ export default async function PositionDetailPage({
 }: {
   params: { id: string }
 }) {
-  const supabase = createClient()
-  const admin = createAdminClient()
+  const supabase = await createClient()
+  const admin = await createAdminClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')

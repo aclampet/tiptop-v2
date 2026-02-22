@@ -5,14 +5,14 @@ import type { CreateWorkerRequest, UpdateWorkerRequest } from '@/types'
 
 // GET /api/workers - Get authenticated worker with positions
 export async function GET(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
   
   // Get worker with positions and company details
   const { data: worker, error: workerError } = await admin
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/workers - Create worker profile
 export async function POST(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   // Check if worker already exists
   const { data: existing } = await admin
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
 
 // PATCH /api/workers - Update worker profile
 export async function PATCH(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
@@ -117,7 +117,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   const body: UpdateWorkerRequest = await request.json()
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   // Get worker ID
   const { data: worker } = await admin

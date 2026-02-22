@@ -3,14 +3,14 @@ import { createClient, createAdminClient } from '@/supabase/server'
 
 // Helper: verify the authenticated user owns this position
 async function verifyOwnership(request: NextRequest, positionId: string) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
 
   if (authError || !user) {
     return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   const { data: position } = await admin
     .from('positions')
@@ -43,7 +43,7 @@ export async function PATCH(
   const result = await verifyOwnership(request, params.id)
   if ('error' in result && result.error) return result.error
 
-  const { admin } = result as { admin: ReturnType<typeof createAdminClient>; worker: any; user: any }
+  const { admin } = result as { admin: Awaited<ReturnType<typeof createAdminClient>>; worker: any; user: any }
   const body = await request.json()
 
   // Only allow safe fields to be updated
@@ -81,7 +81,7 @@ export async function DELETE(
   const result = await verifyOwnership(request, params.id)
   if ('error' in result && result.error) return result.error
 
-  const { admin } = result as { admin: ReturnType<typeof createAdminClient>; worker: any; user: any }
+  const { admin } = result as { admin: Awaited<ReturnType<typeof createAdminClient>>; worker: any; user: any }
 
   // Delete in order: reviews → qr_tokens → position (cascade should handle this,
   // but be explicit for safety)

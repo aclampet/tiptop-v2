@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/supabase/server'
+import { verifyVerificationToken } from '@/lib/utils'
 
 // POST /api/positions/[id]/verify-email
 // Called when user clicks verification link in email
@@ -14,12 +15,11 @@ export async function POST(
     return NextResponse.json({ error: 'Verification token required' }, { status: 400 })
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
-  // Verify token (in production, you'd validate a JWT or signed token)
-  // For now, we'll use a simple approach where token = position_id
-  if (token !== positionId) {
-    return NextResponse.json({ error: 'Invalid verification token' }, { status: 400 })
+  // Verify token signature and expiration
+  if (!verifyVerificationToken(token, positionId)) {
+    return NextResponse.json({ error: 'Invalid or expired verification token' }, { status: 400 })
   }
 
   // Get position with company

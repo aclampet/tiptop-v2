@@ -6,12 +6,12 @@ import GenerateQRButton from './GenerateQRButton'
 export const dynamic = 'force-dynamic'
 
 export default async function QRCodesPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   // Get worker
   const { data: worker } = await admin

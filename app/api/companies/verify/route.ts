@@ -4,7 +4,7 @@ import { sendCompanyVerificationConfirmation, notifyAdminNewVerificationRequest 
 
 // POST /api/companies/verify - Submit company for verification
 export async function POST(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     }, { status: 400 })
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   // Verify company exists
   const { data: company } = await admin

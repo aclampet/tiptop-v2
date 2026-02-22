@@ -5,7 +5,7 @@ import { formatRating } from '@/lib/utils'
 export const dynamic = 'force-dynamic'
 
 export default async function AdminWorkersPage() {
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   const { data: workers } = await admin
     .from('workers')

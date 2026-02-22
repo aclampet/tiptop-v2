@@ -4,7 +4,7 @@ import type { CreateQRTokenRequest, UpdateQRTokenRequest } from '@/types'
 
 // GET /api/qr-tokens?position_id=xxx - Get QR tokens for a position
 export async function GET(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Position ID required' }, { status: 400 })
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   // Verify position ownership
   const { data: position } = await admin
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/qr-tokens - Create QR token for position
 export async function POST(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Position ID required' }, { status: 400 })
   }
 
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   // Verify position ownership
   const { data: position } = await admin
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
 
 // PATCH /api/qr-tokens/[id] - Update QR token
 export async function PATCH(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
@@ -134,7 +134,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   const body: UpdateQRTokenRequest = await request.json()
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
 
   // Verify ownership through position → worker chain
   const { data: token } = await admin

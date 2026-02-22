@@ -8,7 +8,7 @@ export default async function AdminCompaniesPage({
 }: {
   searchParams: { status?: string; page?: string }
 }) {
-  const admin = createAdminClient()
+  const admin = await createAdminClient()
   const status = searchParams.status || 'all'
   const page = parseInt(searchParams.page || '1')
   const limit = 50
@@ -37,8 +37,8 @@ export default async function AdminCompaniesPage({
 
       const positionCount = positions?.length || 0
       const totalReviews = positions?.reduce((sum, p) => sum + p.review_count, 0) || 0
-      const avgRating = positions?.length 
-        ? positions.reduce((sum, p) => sum + (p.rating * p.review_count), 0) / totalReviews
+      const avgRating = totalReviews > 0
+        ? positions!.reduce((sum, p) => sum + (p.rating * p.review_count), 0) / totalReviews
         : 0
 
       return {
@@ -62,7 +62,7 @@ export default async function AdminCompaniesPage({
         </div>
         <Link
           href="/admin/companies/new"
-          className="bg-navy-600 hover:bg-navy-500 text-navy-600 px-6 py-3 rounded-lg font-semibold transition-all"
+          className="bg-navy-600 hover:bg-navy-500 text-white px-6 py-3 rounded-lg font-semibold transition-all"
         >
           + Add Verified Company
         </Link>
@@ -161,7 +161,7 @@ export default async function AdminCompaniesPage({
               href={`/admin/companies?status=${status}&page=${p}`}
               className={`px-4 py-2 rounded-lg transition-colors ${
                 p === page
-                  ? 'bg-navy-600 text-navy-600'
+                  ? 'bg-navy-600 text-white'
                   : 'bg-white text-soft-500 hover:bg-soft-100'
               }`}
             >
@@ -180,7 +180,7 @@ function FilterTab({ href, label, active }: { href: string; label: string; activ
       href={href}
       className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
         active
-          ? 'bg-navy-600 text-navy-600'
+          ? 'bg-navy-600 text-white'
           : 'bg-white text-soft-500 hover:bg-soft-100'
       }`}
     >
