@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createAdminClient } from '@/supabase/server'
 import { slugify } from '@/lib/utils'
 import { sendPositionVerificationEmail, sendHRApprovalRequest } from '@/lib/email'
-import type { CreatePositionRequest, UpdatePositionRequest } from '@/types'
+import type { CreatePositionRequest } from '@/types'
 
 // GET /api/positions - Get all positions for authenticated worker
 export async function GET(request: NextRequest) {
@@ -196,62 +196,3 @@ export async function POST(request: NextRequest) {
   })
 }
 
-// PATCH /api/positions/[id] - Update position
-export async function PATCH(request: NextRequest) {
-  const supabase = createClient()
-  
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  // Get position ID from URL
-  const url = new URL(request.url)
-  const positionId = url.pathname.split('/').pop()
-
-  if (!positionId) {
-    return NextResponse.json({ error: 'Position ID required' }, { status: 400 })
-  }
-
-  const body: UpdatePositionRequest = await request.json()
-  const admin = createAdminClient()
-
-  // Verify ownership
-  const { data: position } = await admin
-    .from('positions')
-    .select('worker_id')
-    .eq('id', positionId)
-    .single()
-
-  if (!position) {
-    return NextResponse.json({ error: 'Position not found' }, { status: 404 })
-  }
-
-  const { data: worker } = await admin
-    .from('workers')
-    .select('id')
-    .eq('auth_user_id', user.id)
-    .single()
-
-  if (!worker || worker.id !== position.worker_id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
-  }
-
-  // Update position
-  const { data: updated, error: updateError } = await admin
-    .from('positions')
-    .update(body)
-    .eq('id', positionId)
-    .select(`
-      *,
-      company:companies (*)
-    `)
-    .single()
-
-  if (updateError) {
-    console.error('Error updating position:', updateError)
-    return NextResponse.json({ error: 'Failed to update position' }, { status: 500 })
-  }
-
-  return NextResponse.json({ position: updated })
-}

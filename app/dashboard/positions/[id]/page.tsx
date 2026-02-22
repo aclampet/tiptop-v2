@@ -3,6 +3,7 @@ import { createClient } from '@/supabase/server'
 import Link from 'next/link'
 import { formatRating, formatDateRange, getDurationMonths, formatDuration } from '@/lib/utils'
 import VerificationActions from './VerificationActions'
+import PositionManagement from './PositionManagement'
 
 export const dynamic = 'force-dynamic'
 
@@ -156,6 +157,19 @@ export default async function PositionDetailPage({
             </div>
           )}
         </div>
+      </div>
+
+      {/* Manage Position */}
+      <div className="bg-white/5 border border-white/10 rounded-xl p-6 mb-8">
+        <h2 className="text-lg font-semibold text-white mb-4">Manage Position</h2>
+        <PositionManagement
+          positionId={position.id}
+          title={position.title}
+          startDate={position.start_date}
+          endDate={position.end_date}
+          isActive={position.is_active}
+          reviewCount={position.review_count}
+        />
       </div>
 
       {/* Verification Section - Show if NOT verified */}
