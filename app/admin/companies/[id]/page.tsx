@@ -286,7 +286,7 @@ export default function EditCompanyPage({ params }: { params: { id: string } }) 
           <button
             type="submit"
             disabled={saving || !name}
-            className="flex-1 bg-navy-600 hover:bg-navy-500 disabled:bg-soft-300 disabled:text-soft-400 text-navy-600 py-3 rounded-xl font-semibold transition-all"
+            className="flex-1 bg-navy-600 hover:bg-navy-500 disabled:bg-soft-300 disabled:text-soft-400 text-white py-3 rounded-xl font-semibold transition-all"
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </button>
