@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/supabase/client'
 import Link from 'next/link'
+import Logo from '@/components/Logo'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -41,14 +42,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/">
-            <span 
-              style={{ fontFamily: 'var(--font-display)' }}
-              className="text-4xl text-navy-500 hover:text-navy-400 transition-colors"
-            >
-              TipTop
-            </span>
-          </Link>
+          <Logo size="lg" />
           <p className="text-soft-400 mt-2 text-sm">Sign in to your account</p>
         </div>
 

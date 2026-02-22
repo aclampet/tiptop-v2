@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient, createAdminClient } from '@/supabase/server'
 import Link from 'next/link'
+import Logo from '@/components/Logo'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,14 +44,7 @@ export default async function AdminLayout({
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-soft-200 flex flex-col">
         <div className="p-6">
-          <Link href="/">
-            <span 
-              style={{ fontFamily: 'var(--font-display)' }}
-              className="text-2xl text-navy-500 hover:text-navy-400 transition-colors"
-            >
-              TipTop
-            </span>
-          </Link>
+          <Logo size="sm" />
           <p className="text-xs text-soft-400 mt-1">Admin Panel</p>
         </div>
 

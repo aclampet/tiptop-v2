@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/supabase/server'
 import Link from 'next/link'
 import LogoutButton from '@/components/dashboard/LogoutButton'
+import Logo from '@/components/Logo'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,7 +31,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="min-h-screen bg-soft-50 flex">
       <aside className="w-64 bg-navy-600 flex flex-col shrink-0">
         <div className="p-6">
-          <Link href="/"><span className="font-display text-2xl text-white hover:text-gold-300 transition-colors">TipTop</span></Link>
+          <Logo size="sm" />
         </div>
         <div className="px-6 py-4 border-y border-white/10">
           <p className="text-white font-semibold">{worker.display_name}</p>

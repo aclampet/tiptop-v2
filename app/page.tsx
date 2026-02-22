@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Logo from '@/components/Logo'
 
 export default function HomePage() {
   return (
@@ -6,7 +7,7 @@ export default function HomePage() {
       {/* Nav — Navy */}
       <nav className="bg-navy-600">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/"><span className="font-display text-2xl text-white">TipTop</span></Link>
+          <Logo size="sm" />
           <div className="flex items-center gap-4">
             <Link href="/login" className="text-sm text-white/80 hover:text-white transition-colors">Sign In</Link>
             <Link href="/signup" className="bg-gold-300 hover:bg-gold-400 text-navy-600 px-5 py-2 rounded-lg text-sm font-semibold transition-colors">Get Started</Link>
@@ -100,7 +101,7 @@ export default function HomePage() {
       <footer className="bg-navy-700 py-10 px-6">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div>
-            <span className="font-display text-xl text-white">TipTop</span>
+            <Logo size="sm" />
             <p className="text-navy-200 text-sm mt-1">Portable professional reputation</p>
           </div>
           <p className="text-navy-300 text-sm">&copy; {new Date().getFullYear()} TipTop.review</p>
