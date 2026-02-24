@@ -147,6 +147,10 @@ const env = {
     limit: parseInt(process.env.RATE_LIMIT_CLAIM_MAX || '5', 10),
     window: parseInt(process.env.RATE_LIMIT_CLAIM_WINDOW_SECONDS || '600', 10),
   },
+  search: {
+    limit: parseInt(process.env.RATE_LIMIT_SEARCH_MAX || '30', 10),
+    window: parseInt(process.env.RATE_LIMIT_SEARCH_WINDOW_SECONDS || '60', 10),
+  },
   membersInvite: {
     limit: parseInt(process.env.RATE_LIMIT_MEMBERS_INVITE_MAX || '20', 10),
     window: parseInt(process.env.RATE_LIMIT_MEMBERS_INVITE_WINDOW_SECONDS || '86400', 10),
@@ -198,5 +202,13 @@ export async function limitMembersInvite(userId: string, companyId: string): Pro
     key: `members-invite:${userId}:${companyId}`,
     limit: env.membersInvite.limit,
     windowSeconds: env.membersInvite.window,
+  })
+}
+
+export async function limitSearch(ip: string): Promise<RateLimitResult> {
+  return rateLimit({
+    key: `search:${ip}`,
+    limit: env.search.limit,
+    windowSeconds: env.search.window,
   })
 }

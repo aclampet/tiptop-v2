@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Logo from '@/components/Logo'
+import HomeSearch from '@/app/components/HomeSearch'
 
 export default function HomePage() {
   return (
@@ -26,9 +27,12 @@ export default function HomePage() {
             </span>{' '}
             that follows you
           </h1>
-          <p className="text-base sm:text-lg text-soft-500 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">
+          <p className="text-base sm:text-lg text-soft-500 max-w-2xl mx-auto mb-6 sm:mb-8 leading-relaxed">
             TipTop gives service workers a portable professional profile. Collect verified reviews across every job — they travel with you, not your employer.
           </p>
+          <div className="mb-8 sm:mb-10">
+            <HomeSearch />
+          </div>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             <Link href="/signup" className="bg-gold-300 hover:bg-gold-400 text-navy-600 px-8 py-4 rounded-lg font-semibold text-lg transition-colors">
               Build Now
