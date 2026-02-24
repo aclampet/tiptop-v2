@@ -30,6 +30,14 @@ Build your reputation once, carry it everywhere. TipTop enables service workers 
 
 ---
 
+## Development Workflow
+
+- **Always run `npm run verify` before pushing to main.** It runs typecheck and build to catch errors early.
+- **main** = production branch. Pushes to main deploy to production.
+- **dev** = preview development branch for testing changes before merging to main.
+
+---
+
 ## 🚀 Quick Start
 
 ### Prerequisites
