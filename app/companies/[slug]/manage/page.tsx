@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/supabase/client'
 import Link from 'next/link'
 import { HR_PROFILE_REJECTED_REASONS, getReasonLabel } from '@/lib/verification-reasons'
+import type { VerificationEventMetadata } from '@/types'
 
 export default function ManageCompanyPage({ params }: { params: { slug: string } }) {
   const router = useRouter()
@@ -26,7 +27,7 @@ export default function ManageCompanyPage({ params }: { params: { slug: string }
   const [rejectingFor, setRejectingFor] = useState<string | null>(null)
   const [rejectReason, setRejectReason] = useState('')
   const [rejectNote, setRejectNote] = useState('')
-  const [verificationEvents, setVerificationEvents] = useState<{ id: string; event_type: string; actor_type: string; actor_user_id: string | null; position_id: string | null; metadata: Record<string, unknown> | null; created_at: string }[]>([])
+  const [verificationEvents, setVerificationEvents] = useState<{ id: string; event_type: string; actor_type: string; actor_user_id: string | null; position_id: string | null; metadata: unknown; created_at: string }[]>([])
   const [featuredEmployees, setFeaturedEmployees] = useState<{ position: any; worker: any }[]>([])
   const [allEmployees, setAllEmployees] = useState<{ position: any; worker: any }[]>([])
   const [featuredActing, setFeaturedActing] = useState<string | null>(null)
@@ -539,31 +540,37 @@ export default function ManageCompanyPage({ params }: { params: { slug: string }
               <p className="text-sm text-soft-500">No verification events yet.</p>
             ) : (
               <ul className="space-y-2 max-h-64 overflow-y-auto">
-                {verificationEvents.map((ev) => (
-                  <li key={ev.id} className="flex items-start gap-3 py-2 border-b border-soft-100 last:border-0 text-sm">
-                    <span className="text-soft-400 shrink-0">
-                      {new Date(ev.created_at).toLocaleString()}
-                    </span>
-                    <span className="text-soft-600">
-                      {ev.event_type === 'hr_profile_approved' && 'HR profile approved'}
-                      {ev.event_type === 'hr_profile_rejected' && 'HR profile rejected'}
-                      {ev.event_type === 'position_approved' && 'Position approved'}
-                      {ev.event_type === 'position_denied' && 'Position denied'}
-                    </span>
-                    {ev.metadata?.work_email && (
-                      <span className="text-soft-400">— {String(ev.metadata.work_email)}</span>
-                    )}
-                    {(ev.event_type === 'position_denied' || ev.event_type === 'hr_profile_rejected') && ev.metadata?.reason_code && (
-                      <span className="text-soft-500">
-                        ({getReasonLabel(ev.event_type as 'position_denied' | 'hr_profile_rejected', String(ev.metadata.reason_code))}
-                        {ev.metadata.reason_note ? `: ${String(ev.metadata.reason_note).slice(0, 80)}${String(ev.metadata.reason_note).length > 80 ? '…' : ''}` : ''})
+                {verificationEvents.map((ev) => {
+                  const metadata: VerificationEventMetadata | null =
+                    typeof ev.metadata === 'object' && ev.metadata !== null
+                      ? (ev.metadata as VerificationEventMetadata)
+                      : null
+                  return (
+                    <li key={ev.id} className="flex items-start gap-3 py-2 border-b border-soft-100 last:border-0 text-sm">
+                      <span className="text-soft-400 shrink-0">
+                        {new Date(ev.created_at).toLocaleString()}
                       </span>
-                    )}
-                    <span className="text-soft-400">
-                      {ev.actor_type === 'user' ? 'Action by Verified HR' : 'Action via HR Email Link'}
-                    </span>
-                  </li>
-                ))}
+                      <span className="text-soft-600">
+                        {ev.event_type === 'hr_profile_approved' && 'HR profile approved'}
+                        {ev.event_type === 'hr_profile_rejected' && 'HR profile rejected'}
+                        {ev.event_type === 'position_approved' && 'Position approved'}
+                        {ev.event_type === 'position_denied' && 'Position denied'}
+                      </span>
+                      {metadata?.work_email && (
+                        <span className="text-soft-400">— {metadata.work_email}</span>
+                      )}
+                      {(ev.event_type === 'position_denied' || ev.event_type === 'hr_profile_rejected') && metadata?.reason_code && (
+                        <span className="text-soft-500">
+                          ({getReasonLabel(ev.event_type as 'position_denied' | 'hr_profile_rejected', metadata.reason_code)}
+                          {metadata.reason_note ? `: ${metadata.reason_note.slice(0, 80)}${metadata.reason_note.length > 80 ? '…' : ''}` : ''})
+                        </span>
+                      )}
+                      <span className="text-soft-400">
+                        {ev.actor_type === 'user' ? 'Action by Verified HR' : 'Action via HR Email Link'}
+                      </span>
+                    </li>
+                  )
+                })}
               </ul>
             )}
           </div>

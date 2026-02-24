@@ -8,6 +8,13 @@
 
 export type VerificationStatus = 'verified' | 'registered' | 'unverified'
 export type VerificationRequestStatus = 'pending' | 'approved' | 'denied' | 'needs_info'
+
+export type VerificationEventMetadata = {
+  work_email?: string
+  reason_code?: string
+  reason_note?: string
+  token_based?: boolean
+}
 export type BadgeTier = 'bronze' | 'silver' | 'gold' | 'platinum'
 export type BadgeCategory = 'volume' | 'rating' | 'streak' | 'specialty' | 'course'
 export type UserRole = 'worker' | 'admin' | 'company_admin'
