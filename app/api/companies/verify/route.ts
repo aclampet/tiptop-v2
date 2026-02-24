@@ -1,32 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient, createAdminClient } from '@/supabase/server'
+import { createClient } from '@/supabase/server'
 import { sendCompanyVerificationConfirmation, notifyAdminNewVerificationRequest } from '@/lib/email'
 
 // POST /api/companies/verify - Submit company for verification
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
-  
+
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { 
-    company_id, 
-    verification_email,
-    requested_domain 
-  } = await request.json()
+  const { company_id, verification_email, requested_domain } = await request.json()
 
   if (!company_id || !verification_email) {
-    return NextResponse.json({ 
-      error: 'Company ID and verification email required' 
+    return NextResponse.json({
+      error: 'Company ID and verification email required'
     }, { status: 400 })
   }
 
-  const admin = await createAdminClient()
-
-  // Verify company exists
-  const { data: company } = await admin
+  const { data: company } = await supabase
     .from('companies')
     .select('*')
     .eq('id', company_id)
@@ -36,15 +29,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Company not found' }, { status: 404 })
   }
 
-  // Check if already verified
   if (company.verification_status === 'verified') {
-    return NextResponse.json({ 
-      error: 'Company is already verified' 
-    }, { status: 409 })
+    return NextResponse.json({ error: 'Company is already verified' }, { status: 409 })
   }
 
-  // Check if pending request exists
-  const { data: existing } = await admin
+  const { data: existing } = await supabase
     .from('company_verification_requests')
     .select('*')
     .eq('company_id', company_id)
@@ -52,21 +41,17 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (existing) {
-    return NextResponse.json({ 
-      error: 'Verification request already pending' 
-    }, { status: 409 })
+    return NextResponse.json({ error: 'Verification request already pending' }, { status: 409 })
   }
 
-  // Verify email domain matches requested domain
   const emailDomain = verification_email.split('@')[1]?.toLowerCase()
   if (requested_domain && emailDomain !== requested_domain.toLowerCase()) {
-    return NextResponse.json({ 
-      error: 'Email domain must match requested verification domain' 
+    return NextResponse.json({
+      error: 'Email domain must match requested verification domain'
     }, { status: 400 })
   }
 
-  // Create verification request
-  const { data: request_data, error: requestError } = await admin
+  const { data: request_data, error: requestError } = await supabase
     .from('company_verification_requests')
     .insert({
       company_id,

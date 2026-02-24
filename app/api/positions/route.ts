@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient, createAdminClient } from '@/supabase/server'
+import { createClient } from '@/supabase/server'
 import { slugify } from '@/lib/utils'
 import { sendPositionVerificationEmail, sendHRApprovalRequest } from '@/lib/email'
 import type { CreatePositionRequest } from '@/types'
@@ -7,16 +7,13 @@ import type { CreatePositionRequest } from '@/types'
 // GET /api/positions - Get all positions for authenticated worker
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
-  
+
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const admin = await createAdminClient()
-  
-  // Get worker
-  const { data: worker } = await admin
+  const { data: worker } = await supabase
     .from('workers')
     .select('id')
     .eq('auth_user_id', user.id)
@@ -26,8 +23,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Worker not found' }, { status: 404 })
   }
 
-  // Get positions with company details
-  const { data: positions, error: positionsError } = await admin
+  const { data: positions, error: positionsError } = await supabase
     .from('positions')
     .select(`
       *,
@@ -47,17 +43,15 @@ export async function GET(request: NextRequest) {
 // POST /api/positions - Create new position
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
-  
+
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const body: CreatePositionRequest = await request.json()
-  const admin = await createAdminClient()
 
-  // Get worker
-  const { data: worker } = await admin
+  const { data: worker } = await supabase
     .from('workers')
     .select('id, display_name')
     .eq('auth_user_id', user.id)
@@ -69,11 +63,10 @@ export async function POST(request: NextRequest) {
 
   let companyId = body.company_id
 
-  // If no company_id provided, create new company
   if (!companyId && body.company_name) {
     const companySlug = slugify(body.company_name)
-    
-    const { data: newCompany, error: companyError } = await admin
+
+    const { data: newCompany, error: companyError } = await supabase
       .from('companies')
       .insert({
         name: body.company_name,
@@ -102,8 +95,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Company ID or name required' }, { status: 400 })
   }
 
-  // Get company details for verification logic
-  const { data: company } = await admin
+  const { data: company } = await supabase
     .from('companies')
     .select('*')
     .eq('id', companyId)
@@ -113,17 +105,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Company not found' }, { status: 404 })
   }
 
-  // Check if verification email matches company domain
   let emailVerified = false
   if (body.verification_email && company.email_domain) {
     const emailDomain = body.verification_email.split('@')[1]?.toLowerCase()
     if (emailDomain === company.email_domain.toLowerCase()) {
-      emailVerified = true  // Will be set to true after email confirmation
+      emailVerified = true
     }
   }
 
-  // Create position
-  const { data: position, error: positionError } = await admin
+  const { data: position, error: positionError } = await supabase
     .from('positions')
     .insert({
       worker_id: worker.id,
@@ -132,7 +122,7 @@ export async function POST(request: NextRequest) {
       start_date: body.start_date,
       end_date: body.end_date || null,
       verification_email: body.verification_email || null,
-      email_verified: false,  // Will be verified via email link
+      email_verified: false,
       hr_verified: false,
       is_active: true,
     })
@@ -147,13 +137,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to create position' }, { status: 500 })
   }
 
-  // Auto-create QR token for this position
-  const { data: qrToken } = await admin
+  const { data: qrToken } = await supabase
     .from('qr_tokens')
     .insert({
       position_id: position.id,
       label: `${body.title} at ${company.name}`,
-      is_active: false,  // Inactive until verified
+      is_active: false,
     })
     .select()
     .single()

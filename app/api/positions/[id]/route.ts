@@ -1,49 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient, createAdminClient } from '@/supabase/server'
+import { createClient } from '@/supabase/server'
 
-// Helper: verify the authenticated user owns this position
 async function verifyOwnership(request: NextRequest, positionId: string) {
   const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    console.error('Auth error:', authError)
     return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
   }
 
-  const admin = await createAdminClient()
-
-  const { data: position, error: positionError } = await admin
+  const { data: position, error: positionError } = await supabase
     .from('positions')
     .select('worker_id')
     .eq('id', positionId)
     .single()
 
-  if (positionError) {
-    console.error('Error fetching position:', positionError)
+  if (positionError || !position) {
     return { error: NextResponse.json({ error: 'Position not found' }, { status: 404 }) }
   }
 
-  if (!position) {
-    return { error: NextResponse.json({ error: 'Position not found' }, { status: 404 }) }
-  }
-
-  const { data: worker, error: workerError } = await admin
+  const { data: worker } = await supabase
     .from('workers')
     .select('id')
     .eq('auth_user_id', user.id)
     .single()
 
-  if (workerError) {
-    console.error('Error fetching worker:', workerError)
-    return { error: NextResponse.json({ error: 'Worker profile not found' }, { status: 404 }) }
-  }
-
   if (!worker || worker.id !== position.worker_id) {
     return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 403 }) }
   }
 
-  return { admin, worker, user }
+  return { supabase, worker, user }
 }
 
 // PATCH /api/positions/[id] — Update position (title, dates, is_active)
@@ -54,10 +40,9 @@ export async function PATCH(
   const result = await verifyOwnership(request, params.id)
   if ('error' in result && result.error) return result.error
 
-  const { admin } = result as { admin: Awaited<ReturnType<typeof createAdminClient>>; worker: any; user: any }
+  const { supabase } = result as { supabase: Awaited<ReturnType<typeof createClient>>; worker: any; user: any }
   const body = await request.json()
 
-  // Only allow safe fields to be updated
   const allowedFields: Record<string, any> = {}
   if (body.title !== undefined) allowedFields.title = body.title
   if (body.start_date !== undefined) allowedFields.start_date = body.start_date
@@ -69,7 +54,7 @@ export async function PATCH(
     return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })
   }
 
-  const { data: updated, error: updateError } = await admin
+  const { data: updated, error: updateError } = await supabase
     .from('positions')
     .update(allowedFields)
     .eq('id', params.id)
@@ -84,62 +69,31 @@ export async function PATCH(
   return NextResponse.json({ position: updated })
 }
 
-// DELETE /api/positions/[id] — Delete position and associated data
+// DELETE /api/positions/[id] — Delete position (CASCADE removes reviews, qr_tokens)
 export async function DELETE(
   request: NextRequest,
   context: { params: { id: string } }
 ) {
-  try {
-    const { id: positionId } = context.params
-    console.log('DELETE position request:', positionId)
+  const { id: positionId } = context.params
 
-    if (!positionId) {
-      return NextResponse.json({ error: 'Position ID is required' }, { status: 400 })
-    }
-
-    const result = await verifyOwnership(request, positionId)
-    if ('error' in result && result.error) return result.error
-
-    const { admin } = result as { admin: Awaited<ReturnType<typeof createAdminClient>>; worker: any; user: any }
-
-    // Delete in order: reviews → qr_tokens → position (cascade should handle this,
-    // but be explicit for safety)
-    const { error: reviewsError } = await admin
-      .from('reviews')
-      .delete()
-      .eq('position_id', positionId)
-
-    if (reviewsError) {
-      console.error('Error deleting reviews:', reviewsError)
-      return NextResponse.json({ error: 'Failed to delete associated reviews' }, { status: 500 })
-    }
-    console.log('Deleted reviews for position:', positionId)
-
-    const { error: tokensError } = await admin
-      .from('qr_tokens')
-      .delete()
-      .eq('position_id', positionId)
-
-    if (tokensError) {
-      console.error('Error deleting QR tokens:', tokensError)
-      return NextResponse.json({ error: 'Failed to delete associated QR tokens' }, { status: 500 })
-    }
-    console.log('Deleted QR tokens for position:', positionId)
-
-    const { error: positionError } = await admin
-      .from('positions')
-      .delete()
-      .eq('id', positionId)
-
-    if (positionError) {
-      console.error('Error deleting position:', positionError)
-      return NextResponse.json({ error: 'Failed to delete position' }, { status: 500 })
-    }
-
-    console.log('Position deleted successfully:', positionId)
-    return NextResponse.json({ success: true, message: 'Position deleted' })
-  } catch (err: any) {
-    console.error('Unexpected error in DELETE:', err)
-    return NextResponse.json({ error: err.message || 'Unexpected error' }, { status: 500 })
+  if (!positionId) {
+    return NextResponse.json({ error: 'Position ID is required' }, { status: 400 })
   }
+
+  const result = await verifyOwnership(request, positionId)
+  if ('error' in result && result.error) return result.error
+
+  const { supabase } = result as { supabase: Awaited<ReturnType<typeof createClient>>; worker: any; user: any }
+
+  const { error: positionError } = await supabase
+    .from('positions')
+    .delete()
+    .eq('id', positionId)
+
+  if (positionError) {
+    console.error('Error deleting position:', positionError)
+    return NextResponse.json({ error: 'Failed to delete position' }, { status: 500 })
+  }
+
+  return NextResponse.json({ success: true, message: 'Position deleted' })
 }

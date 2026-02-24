@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient, createAdminClient } from '@/supabase/server'
+import { createClient } from '@/supabase/server'
 
-// GET /api/companies/manage?slug=xxx — Load company for management (verify ownership)
+// GET /api/companies/manage?slug=xxx — Load company for management
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
 
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -17,10 +17,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Company slug required' }, { status: 400 })
   }
 
-  const admin = await createAdminClient()
-
-  // Get company
-  const { data: company } = await admin
+  const { data: company } = await supabase
     .from('companies')
     .select('*')
     .eq('slug', slug)
@@ -30,26 +27,72 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Company not found' }, { status: 404 })
   }
 
-  // Check ownership: user must be the creator OR an admin
-  const { data: userRole } = await admin
+  const { data: userRole } = await supabase
     .from('user_roles')
     .select('role')
     .eq('user_id', user.id)
     .eq('role', 'admin')
     .single()
 
-  if (company.created_by !== user.id && !userRole) {
+  const { data: userMembership } = await supabase
+    .from('company_memberships')
+    .select('role')
+    .eq('company_id', company.id)
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  let hasPosition = false
+  const { data: worker } = await supabase
+    .from('workers')
+    .select('id')
+    .eq('auth_user_id', user.id)
+    .maybeSingle()
+  if (worker) {
+    const { data: pos } = await supabase
+      .from('positions')
+      .select('id')
+      .eq('company_id', company.id)
+      .eq('worker_id', worker.id)
+      .limit(1)
+      .maybeSingle()
+    hasPosition = !!pos
+  }
+
+  const isAllowed =
+    company.created_by === user.id ||
+    !!userRole ||
+    (userMembership && ['owner', 'admin'].includes(userMembership.role)) ||
+    hasPosition
+  if (!isAllowed) {
     return NextResponse.json({ error: 'You do not have permission to manage this company' }, { status: 403 })
   }
 
-  return NextResponse.json({ company })
+  const { data: ownerRow } = await supabase
+    .from('company_memberships')
+    .select('id')
+    .eq('company_id', company.id)
+    .eq('role', 'owner')
+    .limit(1)
+    .maybeSingle()
+  const hasOwner = !!ownerRow
+
+  const canClaim =
+    !hasOwner &&
+    (company.created_by === user.id || hasPosition)
+
+  return NextResponse.json({
+    company,
+    has_owner: hasOwner,
+    user_membership: userMembership ? { role: userMembership.role } : null,
+    can_claim: canClaim,
+  })
 }
 
 // PATCH /api/companies/manage — Update company profile
 export async function PATCH(request: NextRequest) {
   const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
 
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -61,31 +104,6 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Company ID required' }, { status: 400 })
   }
 
-  const admin = await createAdminClient()
-
-  // Verify ownership
-  const { data: company } = await admin
-    .from('companies')
-    .select('id, created_by')
-    .eq('id', company_id)
-    .single()
-
-  if (!company) {
-    return NextResponse.json({ error: 'Company not found' }, { status: 404 })
-  }
-
-  const { data: userRole } = await admin
-    .from('user_roles')
-    .select('role')
-    .eq('user_id', user.id)
-    .eq('role', 'admin')
-    .single()
-
-  if (company.created_by !== user.id && !userRole) {
-    return NextResponse.json({ error: 'You do not have permission to update this company' }, { status: 403 })
-  }
-
-  // Whitelist safe fields
   const allowedFields: Record<string, any> = {}
   const safeFields = ['name', 'city', 'state', 'zip', 'address', 'industry', 'website', 'hr_email']
   for (const field of safeFields) {
@@ -98,12 +116,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })
   }
 
-  // If HR email is being added and company is unverified, upgrade to registered
-  if (allowedFields.hr_email && !company.created_by) {
-    // No change needed - just update
-  }
-
-  const { data: updated, error: updateError } = await admin
+  const { data: updated, error: updateError } = await supabase
     .from('companies')
     .update(allowedFields)
     .eq('id', company_id)
@@ -113,6 +126,10 @@ export async function PATCH(request: NextRequest) {
   if (updateError) {
     console.error('Error updating company:', updateError)
     return NextResponse.json({ error: 'Failed to update company' }, { status: 500 })
+  }
+
+  if (!updated) {
+    return NextResponse.json({ error: 'Company not found' }, { status: 404 })
   }
 
   return NextResponse.json({ company: updated })

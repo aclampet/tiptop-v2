@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/supabase/server'
+import { createClient, createAdminClient } from '@/supabase/server'
 import { getDeviceFingerprint } from '@/lib/utils'
 import { checkBadgeEligibility } from '@/lib/badges'
 import { sendNewReviewEmail } from '@/lib/email'
+import { limitReview, getClientIp } from '@/lib/rateLimit'
 import type { SubmitReviewRequest } from '@/types'
 
-// Rate limiting (in-memory - upgrade to Redis/Vercel KV for production)
-const rateLimitStore = new Map<string, number>()
-
-// GET /api/reviews?position_id=xxx - Get reviews for a position
+// GET /api/reviews?position_id=xxx - Get reviews for a position (public)
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const positionId = searchParams.get('position_id')
@@ -19,11 +17,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Position ID required' }, { status: 400 })
   }
 
-  const admin = await createAdminClient()
+  const supabase = await createClient()
   const offset = (page - 1) * limit
 
-  // Get reviews for this position
-  const { data: reviews, error, count } = await admin
+  const { data: reviews, error, count } = await supabase
     .from('reviews')
     .select('*', { count: 'exact' })
     .eq('position_id', positionId)
@@ -44,51 +41,63 @@ export async function GET(request: NextRequest) {
   })
 }
 
+// CAPTCHA switch (config flag) — not implemented yet
+const REVIEW_REQUIRE_CAPTCHA = process.env.REVIEW_REQUIRE_CAPTCHA === 'true'
+
+const MAX_REVIEW_BODY_BYTES = parseInt(process.env.REVIEW_MAX_BODY_BYTES || '32768', 10)
+
 // POST /api/reviews - Submit a review
 export async function POST(request: NextRequest) {
-  const body: SubmitReviewRequest = await request.json()
-  const { qr_token_id, rating, comment, reviewer_name } = body
-
-  if (!qr_token_id || !rating) {
-    return NextResponse.json({ 
-      error: 'QR token ID and rating required' 
-    }, { status: 400 })
+  const contentLength = request.headers.get('content-length')
+  if (contentLength && parseInt(contentLength, 10) > MAX_REVIEW_BODY_BYTES) {
+    return NextResponse.json({ error: 'Request body too large' }, { status: 413 })
   }
 
-  if (rating < 1 || rating > 5) {
-    return NextResponse.json({ 
-      error: 'Rating must be between 1 and 5' 
-    }, { status: 400 })
+  let body: SubmitReviewRequest
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
-  const admin = await createAdminClient()
+  const { position_id, qr_token_id, rating, comment, reviewer_name } = body
 
-  // Get QR token and verify it's active
-  const { data: token, error: tokenError } = await admin
+  if (!position_id || !qr_token_id || rating === undefined || rating === null) {
+    return NextResponse.json({ error: 'position_id, qr_token_id, and rating are required' }, { status: 400 })
+  }
+
+  if (typeof rating !== 'number' || rating < 1 || rating > 5) {
+    return NextResponse.json({ error: 'Rating must be between 1 and 5' }, { status: 422 })
+  }
+
+  if (REVIEW_REQUIRE_CAPTCHA) {
+    return NextResponse.json({ error: 'CAPTCHA verification required (not yet configured)' }, { status: 503 })
+  }
+
+  const supabase = await createClient()
+
+  const { data: token, error: tokenError } = await supabase
     .from('qr_tokens')
     .select('id, position_id, is_active, scan_count')
     .eq('id', qr_token_id)
     .single()
 
   if (tokenError || !token) {
-    return NextResponse.json({ error: 'Invalid QR token' }, { status: 404 })
+    return NextResponse.json({ error: 'QR token not found' }, { status: 404 })
   }
 
-  if (!token.is_active) {
-    return NextResponse.json({ 
-      error: 'This QR code is no longer active' 
-    }, { status: 400 })
+  if (!token.is_active || token.position_id !== position_id) {
+    return NextResponse.json({ error: 'Invalid QR token for this position' }, { status: 403 })
   }
 
-  // Get position with worker and company info
-  const { data: position } = await admin
+  const { data: position } = await supabase
     .from('positions')
     .select(`
       *,
       worker:workers(id, display_name, auth_user_id),
       company:companies(name)
     `)
-    .eq('id', token.position_id)
+    .eq('id', position_id)
     .single()
 
   if (!position) {
@@ -98,8 +107,7 @@ export async function POST(request: NextRequest) {
   // Generate device fingerprint
   const fingerprint = await getDeviceFingerprint(request)
 
-  // Check for duplicate review (same device, same position)
-  const { data: existing } = await admin
+  const { data: existing } = await supabase
     .from('reviews')
     .select('id')
     .eq('position_id', position.id)
@@ -112,22 +120,16 @@ export async function POST(request: NextRequest) {
     }, { status: 409 })
   }
 
-  // Rate limiting: 1 review per IP per 60 seconds
-  const clientIp = request.headers.get('x-forwarded-for') || 
-                   request.headers.get('x-real-ip') || 
-                   'unknown'
-  const rateLimitKey = `${clientIp}`
-  const now = Date.now()
-  const lastReview = rateLimitStore.get(rateLimitKey)
-
-  if (lastReview && now - lastReview < 60000) {
-    return NextResponse.json({ 
-      error: 'Please wait before submitting another review' 
-    }, { status: 429 })
+  const clientIp = getClientIp(request)
+  const rl = await limitReview(clientIp, position_id)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.', resetSeconds: rl.resetSeconds },
+      { status: 429 }
+    )
   }
 
-  // Insert review
-  const { data: review, error: reviewError } = await admin
+  const { data: review, error: reviewError } = await supabase
     .from('reviews')
     .insert({
       position_id: position.id,
@@ -147,9 +149,6 @@ export async function POST(request: NextRequest) {
     }, { status: 500 })
   }
 
-  // Update rate limit
-  rateLimitStore.set(rateLimitKey, now)
-
   // Note: scan_count is already incremented when QR is scanned (in worker route)
   // No need to increment again here
 
@@ -161,8 +160,7 @@ export async function POST(request: NextRequest) {
     console.error('Badge check failed:', err)
   )
 
-  // Send email notification to worker (non-blocking)
-  // Get worker's email from auth.users
+  const admin = await createAdminClient()
   const { data: authUser } = await admin.auth.admin.getUserById(
     position.worker.auth_user_id
   )

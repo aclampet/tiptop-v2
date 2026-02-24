@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient, createAdminClient } from '@/supabase/server'
+import { createClient } from '@/supabase/server'
 import { slugify } from '@/lib/utils'
-import type { CreateCompanyRequest, UpdateCompanyRequest, SearchCompaniesRequest } from '@/types'
+import type { CreateCompanyRequest, UpdateCompanyRequest } from '@/types'
 
-// GET /api/companies?query=search - Search companies (autocomplete)
+// GET /api/companies?query=search - Search companies (autocomplete, public)
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const query = searchParams.get('query')
@@ -13,14 +13,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Query parameter required' }, { status: 400 })
   }
 
-  const admin = await createAdminClient()
+  const supabase = await createClient()
 
-  // Search companies by name (case-insensitive, partial match)
-  const { data: companies, error } = await admin
+  const { data: companies, error } = await supabase
     .from('companies')
     .select('id, name, city, state, verification_status, email_domain')
     .ilike('name', `%${query}%`)
-    .order('verification_status', { ascending: false })  // Verified first
+    .order('verification_status', { ascending: false })
     .order('name')
     .limit(limit)
 
@@ -29,12 +28,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to search companies' }, { status: 500 })
   }
 
-  // Check for exact match
-  const exactMatch = companies.find(
+  const exactMatch = (companies || []).find(
     c => c.name.toLowerCase() === query.toLowerCase()
   )
 
-  return NextResponse.json({ 
+  return NextResponse.json({
     companies: companies || [],
     exact_match: exactMatch || null
   })
@@ -43,37 +41,34 @@ export async function GET(request: NextRequest) {
 // POST /api/companies - Create new company
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
-  
+
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const body: CreateCompanyRequest = await request.json()
-  
+
   if (!body.name) {
     return NextResponse.json({ error: 'Company name required' }, { status: 400 })
   }
 
-  const admin = await createAdminClient()
   const companySlug = slugify(body.name)
 
-  // Check if company with same slug exists
-  const { data: existing } = await admin
+  const { data: existing } = await supabase
     .from('companies')
     .select('id, name')
     .eq('slug', companySlug)
     .single()
 
   if (existing) {
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: 'Company with similar name already exists',
       existing_company: existing
     }, { status: 409 })
   }
 
-  // Create company
-  const { data: company, error: createError } = await admin
+  const { data: company, error: createError } = await supabase
     .from('companies')
     .insert({
       name: body.name,
@@ -101,7 +96,7 @@ export async function POST(request: NextRequest) {
 // PATCH /api/companies - Update company (requires company_id in body)
 export async function PATCH(request: NextRequest) {
   const supabase = await createClient()
-  
+
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -114,33 +109,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Company ID required in request body' }, { status: 400 })
   }
 
-  const admin = await createAdminClient()
-
-  // Verify ownership or admin role
-  const { data: company } = await admin
-    .from('companies')
-    .select('created_by')
-    .eq('id', companyId)
-    .single()
-
-  if (!company) {
-    return NextResponse.json({ error: 'Company not found' }, { status: 404 })
-  }
-
-  // Check ownership or admin role
-  const { data: userRole } = await admin
-    .from('user_roles')
-    .select('role')
-    .eq('user_id', user.id)
-    .eq('role', 'admin')
-    .single()
-
-  if (company.created_by !== user.id && !userRole) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
-  }
-
-  // Update company
-  const { data: updated, error: updateError } = await admin
+  const { data: updated, error: updateError } = await supabase
     .from('companies')
     .update(updates)
     .eq('id', companyId)
@@ -150,6 +119,10 @@ export async function PATCH(request: NextRequest) {
   if (updateError) {
     console.error('Error updating company:', updateError)
     return NextResponse.json({ error: 'Failed to update company' }, { status: 500 })
+  }
+
+  if (!updated) {
+    return NextResponse.json({ error: 'Company not found' }, { status: 404 })
   }
 
   return NextResponse.json({ company: updated })

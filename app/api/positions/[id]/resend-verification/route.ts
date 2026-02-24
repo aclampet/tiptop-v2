@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient, createAdminClient } from '@/supabase/server'
+import { createClient } from '@/supabase/server'
 import { sendPositionVerificationEmail, sendHRApprovalRequest } from '@/lib/email'
 
 // POST /api/positions/[id]/resend-verification
@@ -10,16 +10,12 @@ export async function POST(
   const { id: positionId } = params
   const supabase = await createClient()
 
-  // Authenticate user
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const admin = await createAdminClient()
-
-  // Get worker
-  const { data: worker } = await admin
+  const { data: worker } = await supabase
     .from('workers')
     .select('id, display_name')
     .eq('auth_user_id', user.id)
@@ -29,8 +25,7 @@ export async function POST(
     return NextResponse.json({ error: 'Worker not found' }, { status: 404 })
   }
 
-  // Get position with company
-  const { data: position, error: positionError } = await admin
+  const { data: position, error: positionError } = await supabase
     .from('positions')
     .select('*, company:companies(*)')
     .eq('id', positionId)
@@ -41,7 +36,6 @@ export async function POST(
     return NextResponse.json({ error: 'Position not found' }, { status: 404 })
   }
 
-  // Already verified
   if (position.email_verified || position.hr_verified) {
     return NextResponse.json({ error: 'Position is already verified' }, { status: 409 })
   }
@@ -49,24 +43,21 @@ export async function POST(
   const body = await request.json()
   const { verification_email, hr_email, update_info } = body
 
-  // If updating info, save new emails
   if (update_info) {
-    // Update verification email on position
     if (verification_email && verification_email !== position.verification_email) {
-      await admin
+      await supabase
         .from('positions')
         .update({ verification_email })
         .eq('id', positionId)
     }
 
-    // Update HR email on company
     if (hr_email && hr_email !== position.company.hr_email) {
-      await admin
+      await supabase
         .from('companies')
-        .update({ 
+        .update({
           hr_email,
-          verification_status: position.company.verification_status === 'unverified' 
-            ? 'registered' 
+          verification_status: position.company.verification_status === 'unverified'
+            ? 'registered'
             : position.company.verification_status,
         })
         .eq('id', position.company.id)

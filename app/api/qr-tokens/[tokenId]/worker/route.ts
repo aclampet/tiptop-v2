@@ -1,14 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/supabase/server'
+import { createClient } from '@/supabase/server'
+import { limitQrScan, getClientIp } from '@/lib/rateLimit'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { tokenId: string } }
 ) {
   const { tokenId } = params
-  const admin = await createAdminClient()
 
-  const { data: token, error: tokenError } = await admin
+  const clientIp = getClientIp(request)
+  const rl = await limitQrScan(clientIp, tokenId)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.', resetSeconds: rl.resetSeconds },
+      { status: 429 }
+    )
+  }
+
+  const supabase = await createClient()
+
+  const { data: token, error: tokenError } = await supabase
     .from('qr_tokens')
     .select(`
       id,
@@ -47,27 +58,21 @@ export async function GET(
   }
 
   if (!token.is_active) {
-    return NextResponse.json({ 
-      error: 'This QR code is no longer active' 
+    return NextResponse.json({
+      error: 'This QR code is no longer active'
     }, { status: 410 })
+  }
+
+  const { data: incremented } = await supabase.rpc('increment_qr_scan', { p_token_id: tokenId })
+  if (!incremented) {
+    return NextResponse.json({ error: 'QR code not found' }, { status: 404 })
   }
 
   const position = token.position as any
   const worker = position.worker as any
   const company = position.company as any
 
-  // Increment scan count (fire-and-forget for performance)
-  // Note: For high-traffic scenarios, consider using a database function 
-  // for atomic increment to prevent race conditions
-  admin
-    .from('qr_tokens')
-    .update({ scan_count: (token.scan_count || 0) + 1 })
-    .eq('id', tokenId)
-    .then(({ error }) => {
-      if (error) console.error('Failed to update scan count:', error)
-    })
-
-  return NextResponse.json({ 
+  return NextResponse.json({
     token: {
       id: token.id,
       label: token.label,

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { createAdminClient } from '@/supabase/server'
+import { createClient, createAdminClient } from '@/supabase/server'
 import { formatRating } from '@/lib/utils'
 import Link from 'next/link'
 
@@ -27,24 +27,12 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function CompanyProfilePage({ params }: { params: { slug: string } }) {
+  const supabase = await createClient()
   const admin = await createAdminClient()
 
-  // Get company with positions and worker details
   const { data: company } = await admin
     .from('companies')
-    .select(`
-      *,
-      positions (
-        *,
-        worker:workers (
-          id,
-          display_name,
-          slug,
-          overall_rating,
-          total_reviews
-        )
-      )
-    `)
+    .select('*')
     .eq('slug', params.slug)
     .single()
 
@@ -52,24 +40,58 @@ export default async function CompanyProfilePage({ params }: { params: { slug: s
     notFound()
   }
 
-  // Calculate company stats
-  const activePositions = company.positions.filter((p: any) => p.is_active)
-  const verifiedPositions = company.positions.filter((p: any) => p.email_verified || p.hr_verified)
-  
-  const allRatings = company.positions
+  // Roster: RLS-filtered positions (show_on_company_page, is_current, worker is_public)
+  const { data: rosterPositions } = await supabase
+    .from('positions')
+    .select(`
+      id,
+      title,
+      rating,
+      review_count,
+      email_verified,
+      hr_verified,
+      worker:workers (
+        id,
+        display_name,
+        slug,
+        avatar_url,
+        overall_rating,
+        total_reviews
+      )
+    `)
+    .eq('company_id', company.id)
+    .eq('show_on_company_page', true)
+    .eq('is_current', true)
+
+  const { data: featuredRows } = await supabase
+    .from('company_featured_workers')
+    .select('worker_id, sort_order')
+    .eq('company_id', company.id)
+    .order('sort_order', { ascending: true })
+
+  const featuredWorkerIds = (featuredRows || []).map((r) => r.worker_id)
+  const byWorker = new Map<string, { position: any; worker: any }>()
+  for (const p of rosterPositions || []) {
+    const w = (p as any).worker
+    if (!w?.id) continue
+    if (!byWorker.has(w.id)) {
+      byWorker.set(w.id, { position: p, worker: w })
+    }
+  }
+  const featured = featuredWorkerIds.map((wid) => byWorker.get(wid)).filter(Boolean) as { position: any; worker: any }[]
+  const restIds = new Set(featuredWorkerIds)
+  const employees = Array.from(byWorker.values()).filter((e) => !restIds.has(e.worker.id))
+
+  // Stats from roster positions
+  const positions = rosterPositions || []
+  const allRatings = positions
     .filter((p: any) => p.review_count > 0)
     .flatMap((p: any) => Array(p.review_count).fill(p.rating))
-  
   const averageRating = allRatings.length > 0
     ? allRatings.reduce((sum: number, r: number) => sum + r, 0) / allRatings.length
     : 0
-
-  const totalReviews = company.positions.reduce((sum: number, p: any) => sum + p.review_count, 0)
-
-  // Get unique workers
-  const uniqueWorkers = Array.from(
-    new Map(company.positions.map((p: any) => [p.worker.id, p.worker])).values()
-  )
+  const totalReviews = positions.reduce((sum: number, p: any) => sum + (p.review_count || 0), 0)
+  const verifiedCount = positions.filter((p: any) => p.email_verified || p.hr_verified).length
 
   return (
     <div className="min-h-screen bg-white">
@@ -143,12 +165,12 @@ export default async function CompanyProfilePage({ params }: { params: { slug: s
             />
             <StatCard
               icon="👥"
-              value={uniqueWorkers.length.toString()}
+              value={employees.length.toString()}
               label="Employees"
             />
             <StatCard
               icon="✅"
-              value={verifiedPositions.length.toString()}
+              value={verifiedCount.toString()}
               label="Verified Positions"
             />
           </div>
@@ -156,24 +178,30 @@ export default async function CompanyProfilePage({ params }: { params: { slug: s
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-12">
-        {/* Employees */}
+        {/* Top Performers */}
+        {featured.length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-navy-600 mb-6">Top Performers</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {featured.map(({ position, worker }) => (
+                <EmployeeCard key={worker.id} worker={worker} position={position} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Team */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-navy-600 mb-6">
-            Employees & Former Employees
-          </h2>
-          
-          {uniqueWorkers.length > 0 ? (
+          <h2 className="text-2xl font-bold text-navy-600 mb-6">Team</h2>
+          {employees.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {uniqueWorkers.map((worker: any) => {
-                const workerPositions = company.positions.filter((p: any) => p.worker.id === worker.id)
-                return (
-                  <WorkerCard key={worker.id} worker={worker} positions={workerPositions} />
-                )
-              })}
+              {employees.map(({ position, worker }) => (
+                <EmployeeCard key={worker.id} worker={worker} position={position} />
+              ))}
             </div>
           ) : (
             <div className="text-center py-12 bg-white border border-soft-200 rounded-xl">
-              <p className="text-soft-400">No employees have added positions yet</p>
+              <p className="text-soft-400">No employees on the roster yet</p>
             </div>
           )}
         </div>
@@ -215,43 +243,44 @@ function StatCard({ icon, value, label }: { icon: string; value: string; label: 
   )
 }
 
-function WorkerCard({ worker, positions }: { worker: any; positions: any[] }) {
-  const currentPosition = positions.find((p: any) => !p.end_date)
-  const positionCount = positions.length
+function EmployeeCard({ worker, position }: { worker: any; position: any }) {
+  const rating = position?.rating > 0 ? position.rating : worker?.overall_rating || 0
+  const reviewCount = position?.review_count ?? worker?.total_reviews ?? 0
+  const isVerified = position?.email_verified || position?.hr_verified
 
   return (
     <Link
       href={`/worker/${worker.slug}`}
       className="block bg-white border border-soft-200 hover:border-gold-300 rounded-xl p-6 transition-all"
     >
+      {worker.avatar_url && (
+        <img
+          src={worker.avatar_url}
+          alt={worker.display_name}
+          className="w-12 h-12 rounded-full object-cover mb-3"
+        />
+      )}
       <h3 className="text-lg font-semibold text-navy-600 mb-2">
         {worker.display_name}
       </h3>
-      
-      {currentPosition ? (
-        <p className="text-navy-500 text-sm mb-3">
-          {currentPosition.title}
-        </p>
-      ) : (
-        <p className="text-soft-400 text-sm mb-3">
-          Former Employee
-        </p>
-      )}
-
-      <div className="flex items-center gap-4 text-sm text-soft-500 mb-3">
+      <p className="text-navy-500 text-sm mb-3">
+        {position?.title || 'Employee'}
+      </p>
+      <div className="flex items-center gap-4 text-sm text-soft-500 mb-2">
         <div className="flex items-center gap-1">
           <span>⭐</span>
-          <span>{worker.overall_rating > 0 ? formatRating(worker.overall_rating) : '—'}</span>
+          <span>{rating > 0 ? formatRating(rating) : '—'}</span>
         </div>
         <div className="flex items-center gap-1">
           <span>💬</span>
-          <span>{worker.total_reviews} reviews</span>
+          <span>{reviewCount} reviews</span>
         </div>
       </div>
-
-      <div className="text-xs text-soft-400">
-        {positionCount} {positionCount === 1 ? 'position' : 'positions'} at this company
-      </div>
+      {isVerified && (
+        <span className="inline-flex items-center gap-1 text-xs text-green-400">
+          ✓ Verified
+        </span>
+      )}
     </Link>
   )
 }

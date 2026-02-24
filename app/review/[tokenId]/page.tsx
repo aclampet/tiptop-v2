@@ -74,6 +74,9 @@ export default function ReviewPage({ params }: { params: { tokenId: string } }) 
     setSubmitting(true)
 
     try {
+      if (!data) {
+        throw new Error('Session expired. Please refresh and try again.')
+      }
       if (rating === 0) {
         throw new Error('Please select a rating')
       }
@@ -82,6 +85,7 @@ export default function ReviewPage({ params }: { params: { tokenId: string } }) 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          position_id: data.position.id,
           qr_token_id: params.tokenId,
           rating,
           comment: comment.trim() || null,

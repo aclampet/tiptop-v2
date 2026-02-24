@@ -87,6 +87,10 @@ export interface Position {
   rating: number
   review_count: number
   is_active: boolean
+  is_current?: boolean
+  show_on_company_page?: boolean
+  started_at?: string | null
+  ended_at?: string | null
   created_at: string
   updated_at: string
 }
@@ -272,6 +276,7 @@ export interface UpdateQRTokenRequest {
 
 // Review API
 export interface SubmitReviewRequest {
+  position_id: string
   qr_token_id: string
   rating: number
   comment?: string

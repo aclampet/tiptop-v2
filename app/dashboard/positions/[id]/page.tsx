@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { formatRating, formatDateRange, getDurationMonths, formatDuration } from '@/lib/utils'
 import VerificationActions from './VerificationActions'
 import PositionManagement from './PositionManagement'
+import RosterVisibility from './RosterVisibility'
 
 export const dynamic = 'force-dynamic'
 
@@ -158,6 +159,21 @@ export default async function PositionDetailPage({
             </div>
           )}
         </div>
+      </div>
+
+      {/* Roster Visibility */}
+      <div className="bg-white border border-soft-200 rounded-xl p-6 mb-8">
+        <h2 className="text-lg font-semibold text-navy-600 mb-4">Employer Page Visibility</h2>
+        <p className="text-sm text-soft-500 mb-4">
+          Control whether you appear on your employer&apos;s public company page. This only affects the employer roster—your personal profile is separate.
+        </p>
+        <RosterVisibility
+          positionId={position.id}
+          showOnCompanyPage={position.show_on_company_page ?? true}
+          startedAt={position.started_at}
+          endedAt={position.ended_at}
+          isCurrent={position.is_current ?? !position.end_date}
+        />
       </div>
 
       {/* Manage Position */}

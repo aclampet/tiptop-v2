@@ -19,12 +19,19 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   if (!worker) redirect('/signup')
 
+  const { data: hrProfile } = await supabase
+    .from('hr_profiles')
+    .select('status')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
   const navItems = [
     { href: '/dashboard', label: 'Overview', icon: '📊' },
     { href: '/dashboard/positions', label: 'Positions', icon: '💼' },
     { href: '/dashboard/reviews', label: 'Reviews', icon: '⭐' },
     { href: '/dashboard/qr', label: 'QR Codes', icon: '📱' },
     { href: '/dashboard/badges', label: 'Badges', icon: '🏆' },
+    ...(hrProfile?.status === 'verified' ? [{ href: '/dashboard/hr', label: 'HR Management', icon: '✓' }] : []),
   ]
 
   return (

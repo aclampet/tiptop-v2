@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { POSITION_DENIED_REASONS, getReasonLabel } from '@/lib/verification-reasons'
 
 export default function HRApproveContent() {
   const searchParams = useSearchParams()
@@ -11,11 +12,15 @@ export default function HRApproveContent() {
   const [success, setSuccess] = useState(false)
   const [action, setAction] = useState<'approve' | 'deny'>('approve')
   const [error, setError] = useState('')
+  const [denyForm, setDenyForm] = useState(false)
+  const [denyReason, setDenyReason] = useState('')
+  const [denyNote, setDenyNote] = useState('')
 
   useEffect(() => {
     const positionId = searchParams.get('id')
     const token = searchParams.get('token')
     const actionParam = searchParams.get('action') as 'approve' | 'deny'
+    const reasonParam = searchParams.get('reason')
 
     if (!positionId || !token || !actionParam) {
       setError('Invalid approval link')
@@ -24,15 +29,30 @@ export default function HRApproveContent() {
     }
 
     setAction(actionParam)
-    handleAction(positionId, token, actionParam)
+
+    if (actionParam === 'deny' && reasonParam && POSITION_DENIED_REASONS.includes(reasonParam as any)) {
+      handleAction(positionId, token, 'deny', reasonParam, '')
+    } else if (actionParam === 'deny') {
+      setDenyForm(true)
+      setLoading(false)
+    } else {
+      handleAction(positionId, token, actionParam)
+    }
   }, [searchParams])
 
-  const handleAction = async (positionId: string, token: string, action: 'approve' | 'deny') => {
+  const handleAction = async (positionId: string, token: string, action: 'approve' | 'deny', reasonCode?: string, reasonNote?: string) => {
+    setLoading(true)
     try {
+      const body: Record<string, unknown> = { token, action }
+      if (action === 'deny') {
+        if (!reasonCode) throw new Error('Please select a reason')
+        body.reason_code = reasonCode
+        if (reasonNote?.trim()) body.reason_note = reasonNote.trim().slice(0, 500)
+      }
       const res = await fetch(`/api/positions/${positionId}/hr-approve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, action }),
+        body: JSON.stringify(body),
       })
 
       const data = await res.json()
@@ -86,6 +106,52 @@ export default function HRApproveContent() {
           </div>
           <h1 className="text-3xl font-bold text-navy-600 mb-4">Position Approved</h1>
           <p className="text-soft-500 mb-8">The employment position has been verified.</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (denyForm) {
+    const positionId = searchParams.get('id')
+    const token = searchParams.get('token')
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
+        <div className="max-w-md w-full">
+          <h1 className="text-2xl font-bold text-navy-600 mb-4">Deny Verification</h1>
+          <p className="text-soft-500 mb-4">Please select a reason for denying this position.</p>
+          <select
+            value={denyReason}
+            onChange={(e) => setDenyReason(e.target.value)}
+            className="w-full px-4 py-3 border border-soft-200 rounded-xl mb-4"
+          >
+            <option value="">Select reason...</option>
+            {POSITION_DENIED_REASONS.map((r) => (
+              <option key={r} value={r}>{getReasonLabel('position_denied', r)}</option>
+            ))}
+          </select>
+          <textarea
+            placeholder="Optional note (max 500 chars)"
+            value={denyNote}
+            onChange={(e) => setDenyNote(e.target.value)}
+            maxLength={500}
+            className="w-full px-4 py-3 border border-soft-200 rounded-xl mb-4"
+            rows={3}
+          />
+          <div className="flex gap-4">
+            <button
+              onClick={() => positionId && token && handleAction(positionId, token, 'deny', denyReason, denyNote)}
+              disabled={loading || !denyReason}
+              className="flex-1 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white py-3 rounded-xl font-semibold"
+            >
+              {loading ? 'Submitting...' : 'Confirm Deny'}
+            </button>
+            <Link
+              href="/"
+              className="flex-1 bg-soft-200 hover:bg-soft-300 text-navy-600 py-3 rounded-xl font-semibold text-center"
+            >
+              Cancel
+            </Link>
+          </div>
         </div>
       </div>
     )

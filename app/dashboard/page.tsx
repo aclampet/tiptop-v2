@@ -50,6 +50,23 @@ export default async function DashboardPage() {
     p.email_verified || p.hr_verified
   )
 
+  const { data: hrProfile } = await supabase
+    .from('hr_profiles')
+    .select('status')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  const { data: hrRole } = await supabase
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', user.id)
+    .eq('role', 'hr')
+    .maybeSingle()
+
+  const showHROnboard = hrRole && hrProfile?.status !== 'verified'
+  const showHRManage = hrProfile?.status === 'verified'
+  const showHRPrompt = !hrRole && !hrProfile
+
   return (
     <div className="p-8">
       {/* Header */}
@@ -89,6 +106,49 @@ export default async function DashboardPage() {
           subtext="Total scans"
         />
       </div>
+
+      {/* HR onboarding / management */}
+      {showHRPrompt && (
+        <div className="mb-8">
+          <Link
+            href="/dashboard/hr/onboard"
+            className="text-sm text-soft-500 hover:text-navy-600"
+          >
+            I&apos;m an HR professional — verify to manage position approvals
+          </Link>
+        </div>
+      )}
+      {showHROnboard && (
+        <div className="bg-gold-500/10 border border-gold-300/20 rounded-xl p-6 mb-8">
+          <div className="flex items-start gap-4">
+            <div className="text-4xl">👔</div>
+            <div className="flex-1">
+              <h2 className="text-xl font-semibold text-navy-600 mb-2">
+                HR Verification
+              </h2>
+              <p className="text-soft-500 mb-4">
+                Complete your HR profile to manage position verification requests for your company.
+              </p>
+              <Link
+                href="/dashboard/hr/onboard"
+                className="inline-block bg-navy-600 hover:bg-navy-500 text-white px-6 py-3 rounded-lg font-semibold transition-all"
+              >
+                Verify HR Profile
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+      {showHRManage && (
+        <div className="mb-8">
+          <Link
+            href="/dashboard/hr"
+            className="inline-block bg-gold-500/20 hover:bg-gold-500/30 border border-gold-300/30 text-navy-600 px-6 py-3 rounded-lg font-semibold transition-all"
+          >
+            ✓ HR Management — Position Verifications
+          </Link>
+        </div>
+      )}
 
       {/* Quick Actions */}
       {worker.positions.length === 0 && (

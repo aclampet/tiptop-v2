@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/supabase/server'
 import { verifyVerificationToken } from '@/lib/utils'
+import { limitVerifyEmail, getClientIp } from '@/lib/rateLimit'
 
 // POST /api/positions/[id]/verify-email
 // Called when user clicks verification link in email
@@ -13,6 +14,15 @@ export async function POST(
 
   if (!token) {
     return NextResponse.json({ error: 'Verification token required' }, { status: 400 })
+  }
+
+  const clientIp = getClientIp(request)
+  const rl = await limitVerifyEmail(clientIp, positionId)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.', resetSeconds: rl.resetSeconds },
+      { status: 429 }
+    )
   }
 
   const admin = await createAdminClient()

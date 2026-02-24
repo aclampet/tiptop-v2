@@ -1,21 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient, createAdminClient } from '@/supabase/server'
+import { createClient } from '@/supabase/server'
 import { sendWelcomeEmail } from '@/lib/email'
 import type { CreateWorkerRequest, UpdateWorkerRequest } from '@/types'
 
 // GET /api/workers - Get authenticated worker with positions
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
-  
+
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const admin = await createAdminClient()
-  
-  // Get worker with positions and company details
-  const { data: worker, error: workerError } = await admin
+  const { data: worker, error: workerError } = await supabase
     .from('workers')
     .select(`
       *,
@@ -31,13 +28,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Worker not found' }, { status: 404 })
   }
 
-  // Get badges
-  const { data: badges } = await admin
+  const { data: badges } = await supabase
     .from('worker_badges')
     .select('*, badge:badges(*)')
     .eq('worker_id', worker.id)
 
-  return NextResponse.json({ 
+  return NextResponse.json({
     worker: { ...worker, badges: badges || [] }
   })
 }
@@ -45,7 +41,7 @@ export async function GET(request: NextRequest) {
 // POST /api/workers - Create worker profile
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
-  
+
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -61,10 +57,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const admin = await createAdminClient()
-
-  // Check if worker already exists
-  const { data: existing } = await admin
+  const { data: existing } = await supabase
     .from('workers')
     .select('id')
     .eq('auth_user_id', user.id)
@@ -77,14 +70,13 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // Try to create worker, with slug uniqueness handling
   let finalSlug = slug
   let attempts = 0
   let worker = null
   let createError = null
 
   while (attempts < 5) {
-    const { data, error } = await admin
+    const { data, error } = await supabase
       .from('workers')
       .insert({
         auth_user_id: user.id,
@@ -100,7 +92,6 @@ export async function POST(request: NextRequest) {
       break
     }
 
-    // If slug conflict, try with random suffix
     if (error.code === '23505' && error.message?.includes('slug')) {
       const randomSuffix = Math.random().toString(36).substring(2, 6)
       finalSlug = `${slug}-${randomSuffix}`
@@ -119,7 +110,6 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // Send welcome email (non-blocking)
   sendWelcomeEmail({
     email: user.email!,
     displayName: display_name,
@@ -132,31 +122,18 @@ export async function POST(request: NextRequest) {
 // PATCH /api/workers - Update worker profile
 export async function PATCH(request: NextRequest) {
   const supabase = await createClient()
-  
+
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const body: UpdateWorkerRequest = await request.json()
-  const admin = await createAdminClient()
 
-  // Get worker ID
-  const { data: worker } = await admin
-    .from('workers')
-    .select('id')
-    .eq('auth_user_id', user.id)
-    .single()
-
-  if (!worker) {
-    return NextResponse.json({ error: 'Worker not found' }, { status: 404 })
-  }
-
-  // Update worker
-  const { data: updated, error: updateError } = await admin
+  const { data: updated, error: updateError } = await supabase
     .from('workers')
     .update(body)
-    .eq('id', worker.id)
+    .eq('auth_user_id', user.id)
     .select()
     .single()
 
@@ -166,6 +143,10 @@ export async function PATCH(request: NextRequest) {
       { error: 'Failed to update worker' },
       { status: 500 }
     )
+  }
+
+  if (!updated) {
+    return NextResponse.json({ error: 'Worker not found' }, { status: 404 })
   }
 
   return NextResponse.json({ worker: updated })
