@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Link from 'next/link'
 
 interface LogoProps {
@@ -14,22 +13,24 @@ const sizes = {
   lg: { width: 180, height: 56 },
 }
 
-export default function Logo({ 
-  variant = 'dark', 
-  size = 'md', 
+export default function Logo({
+  variant = 'dark',
+  size = 'md',
   linkToHome = true,
-  className = ''
+  className = '',
 }: LogoProps) {
   const { width, height } = sizes[size]
-  
+  const src = variant === 'light' ? '/logo-light.svg' : '/logo.svg'
+
   const logoElement = (
-    <Image
-      src="/logo.png"
+    <img
+      src={src}
       alt="TipTop"
       width={width}
       height={height}
       className={`object-contain ${className}`}
-      priority
+      style={{ height: `${height}px`, width: 'auto' }}
+      fetchPriority="high"
     />
   )
 

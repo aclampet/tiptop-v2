@@ -38,7 +38,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="min-h-screen bg-soft-50 flex">
       <aside className="w-64 bg-navy-600 flex flex-col shrink-0">
         <div className="p-6">
-          <Logo size="sm" />
+          <Logo size="sm" variant="light" />
         </div>
         <div className="px-6 py-4 border-y border-white/10">
           <p className="text-white font-semibold">{worker.display_name}</p>

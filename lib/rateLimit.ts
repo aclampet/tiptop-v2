@@ -148,7 +148,7 @@ const env = {
     window: parseInt(process.env.RATE_LIMIT_CLAIM_WINDOW_SECONDS || '600', 10),
   },
   search: {
-    limit: parseInt(process.env.RATE_LIMIT_SEARCH_MAX || '30', 10),
+    limit: parseInt(process.env.RATE_LIMIT_SEARCH_MAX || '60', 10),
     window: parseInt(process.env.RATE_LIMIT_SEARCH_WINDOW_SECONDS || '60', 10),
   },
   membersInvite: {

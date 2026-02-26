@@ -8,7 +8,7 @@ export default function HomePage() {
       {/* Nav — Navy */}
       <nav className="bg-navy-600">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
-          <Logo size="sm" />
+          <Logo size="sm" variant="light" />
           <div className="flex items-center gap-2 sm:gap-4">
             <Link href="/login" className="text-sm text-white/80 hover:text-white transition-colors hidden sm:block">Sign In</Link>
             <Link href="/signup" className="bg-gold-300 hover:bg-gold-400 text-navy-600 px-4 sm:px-5 py-2 rounded-lg text-sm font-semibold transition-colors">Get Started</Link>
@@ -105,7 +105,7 @@ export default function HomePage() {
       <footer className="bg-navy-700 py-8 sm:py-10 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div>
-            <Logo size="sm" />
+            <Logo size="sm" variant="light" />
             <p className="text-navy-200 text-sm mt-1">Your reputation follows you!</p>
           </div>
           <p className="text-navy-300 text-sm">&copy; {new Date().getFullYear()} TipTop.review</p>

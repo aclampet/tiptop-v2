@@ -32,7 +32,7 @@ export default function HomeSearch() {
     }
     setLoading(true)
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&limit=5`)
+      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&limit=6`)
       if (res.status === 429) {
         setResults([])
         setLoading(false)

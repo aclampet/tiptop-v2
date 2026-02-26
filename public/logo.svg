@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 48" fill="none" role="img" aria-label="TipTop">
+  <!-- Top hat icon (tilted right ~8) -->
+  <g transform="translate(4, 4) rotate(8, 20, 20)">
+    <!-- Brim -->
+    <ellipse cx="20" cy="26" rx="14" ry="4" fill="#1A254E"/>
+    <!-- Crown base -->
+    <rect x="8" y="8" width="24" height="20" rx="1" fill="#1A254E"/>
+    <!-- Crown top band (gold accent) -->
+    <rect x="8" y="8" width="24" height="4" rx="1" fill="#FFC857"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="52" y="34" font-family="Georgia, 'Times New Roman', serif" font-size="28" font-weight="400" fill="#1A254E" letter-spacing="0.02em">TipTop</text>
+</svg>
