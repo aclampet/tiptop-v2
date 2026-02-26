@@ -75,31 +75,53 @@ export async function GET(request: NextRequest) {
   const supabase = await createClient()
   const pattern = `${q}%`
 
-  const [workersRes, companiesRes] = await Promise.all([
+  // Use separate ilike queries (avoid .or() encoding issues with %)
+  const [workersByName, workersBySlug, companiesByName, companiesBySlug] = await Promise.all([
     supabase
       .from('workers')
       .select('slug, display_name, overall_rating')
       .eq('is_public', true)
-      .or(`display_name.ilike.${pattern},slug.ilike.${pattern}`)
+      .ilike('display_name', pattern)
+      .limit(limit),
+    supabase
+      .from('workers')
+      .select('slug, display_name, overall_rating')
+      .eq('is_public', true)
+      .ilike('slug', pattern)
       .limit(limit),
     supabase
       .from('companies')
       .select('slug, name, verification_status')
-      .or(`name.ilike.${pattern},slug.ilike.${pattern}`)
+      .ilike('name', pattern)
+      .limit(limit),
+    supabase
+      .from('companies')
+      .select('slug, name, verification_status')
+      .ilike('slug', pattern)
       .limit(limit),
   ])
 
-  if (workersRes.error) {
-    console.error('Search workers error:', workersRes.error)
+  if (workersByName.error || workersBySlug.error) {
+    console.error('Search workers error:', workersByName.error || workersBySlug.error)
     return NextResponse.json({ error: 'Search failed' }, { status: 500 })
   }
-  if (companiesRes.error) {
-    console.error('Search companies error:', companiesRes.error)
+  if (companiesByName.error || companiesBySlug.error) {
+    console.error('Search companies error:', companiesByName.error || companiesBySlug.error)
     return NextResponse.json({ error: 'Search failed' }, { status: 500 })
   }
 
-  const workers = sortWorkers((workersRes.data || []) as SearchWorker[], q).slice(0, limit)
-  const companies = sortCompanies((companiesRes.data || []) as SearchCompany[], q).slice(0, limit)
+  // Merge and dedupe by slug
+  const workerMap = new Map<string, SearchWorker>()
+  for (const w of [...(workersByName.data || []), ...(workersBySlug.data || [])] as SearchWorker[]) {
+    if (!workerMap.has(w.slug)) workerMap.set(w.slug, w)
+  }
+  const companyMap = new Map<string, SearchCompany>()
+  for (const c of [...(companiesByName.data || []), ...(companiesBySlug.data || [])] as SearchCompany[]) {
+    if (!companyMap.has(c.slug)) companyMap.set(c.slug, c)
+  }
+
+  const workers = sortWorkers(Array.from(workerMap.values()), q).slice(0, limit)
+  const companies = sortCompanies(Array.from(companyMap.values()), q).slice(0, limit)
 
   return NextResponse.json({
     q,

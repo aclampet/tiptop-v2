@@ -1,14 +1,16 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/supabase/client'
 import { slugify } from '@/lib/utils'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/dashboard'
 
   const [step, setStep] = useState<1 | 2>(1)
   const [loading, setLoading] = useState(false)
@@ -69,8 +71,7 @@ export default function SignupPage() {
         throw new Error(data.error || 'Failed to create profile')
       }
 
-      // Redirect to dashboard (add position prompt will show there)
-      router.push('/dashboard')
+      router.push(redirectTo)
       router.refresh()
     } catch (err: any) {
       setError(err.message)
@@ -190,5 +191,17 @@ export default function SignupPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-soft-500">Loading...</div>
+      </div>
+    }>
+      <SignupForm />
+    </Suspense>
   )
 }

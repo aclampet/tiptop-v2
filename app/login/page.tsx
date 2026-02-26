@@ -1,13 +1,15 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/supabase/client'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/dashboard'
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -28,7 +30,7 @@ export default function LoginPage() {
 
       if (signInError) throw signInError
 
-      router.push('/dashboard')
+      router.push(redirectTo)
       router.refresh()
     } catch (err: any) {
       setError(err.message)
@@ -107,5 +109,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-soft-500">Loading...</div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   )
 }
