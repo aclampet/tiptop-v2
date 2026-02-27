@@ -3,7 +3,7 @@ import { createClient } from '@/supabase/server'
 import { getClientIp, limitSearch } from '@/lib/rateLimit'
 
 type SearchWorker = { slug: string; display_name: string; overall_rating: number | null }
-type SearchCompany = { slug: string; name: string; verification_status: string | null }
+type SearchCompany = { slug: string; name: string; city: string | null; state: string | null; verification_status: string | null }
 
 const DEFAULT_LIMIT = 6
 const MAX_LIMIT = 10
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
   const q = raw ? raw.trim() : ''
   if (q.length < 2) {
     return NextResponse.json(
-      { error: 'Query must be at least 2 characters' },
+      { error: 'query_too_short' },
       { status: 400 }
     )
   }
@@ -91,12 +91,12 @@ export async function GET(request: NextRequest) {
       .limit(limit),
     supabase
       .from('companies')
-      .select('slug, name, verification_status')
+      .select('slug, name, city, state, verification_status')
       .ilike('name', pattern)
       .limit(limit),
     supabase
       .from('companies')
-      .select('slug, name, verification_status')
+      .select('slug, name, city, state, verification_status')
       .ilike('slug', pattern)
       .limit(limit),
   ])

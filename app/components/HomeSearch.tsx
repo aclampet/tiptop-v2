@@ -4,8 +4,8 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
-type SearchWorker = { slug: string; display_name: string; overall_rating: number }
-type SearchCompany = { slug: string; name: string; verification_status: string }
+type SearchWorker = { slug: string; display_name: string; overall_rating: number | null }
+type SearchCompany = { slug: string; name: string; city: string | null; state: string | null; verification_status: string | null }
 
 type SearchResult = 
   | { type: 'worker'; slug: string; label: string; sublabel?: string }
@@ -20,6 +20,7 @@ export default function HomeSearch() {
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
   const [highlight, setHighlight] = useState(0)
+  const [rateLimited, setRateLimited] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -28,29 +29,49 @@ export default function HomeSearch() {
     if (q.length < 2) {
       setResults([])
       setLoading(false)
+      setRateLimited(false)
       return
     }
     setLoading(true)
+    setRateLimited(false)
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&limit=6`)
       if (res.status === 429) {
+        setResults([])
+        setRateLimited(true)
+        setLoading(false)
+        return
+      }
+      if (res.status === 400) {
         setResults([])
         setLoading(false)
         return
       }
       const data = await res.json()
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[HomeSearch] /api/search response:', { q: data.q, workers: data.workers?.length ?? 0, companies: data.companies?.length ?? 0 })
+      }
+
       const workers: SearchResult[] = (data.workers || []).map((w: SearchWorker) => ({
         type: 'worker' as const,
         slug: w.slug,
         label: w.display_name,
         sublabel: w.overall_rating ? `${w.overall_rating} ★` : undefined,
       }))
-      const companies: SearchResult[] = (data.companies || []).map((c: SearchCompany) => ({
-        type: 'company' as const,
-        slug: c.slug,
-        label: c.name,
-        sublabel: c.verification_status === 'verified' ? '✓ Verified' : undefined,
-      }))
+      const companies: SearchResult[] = (data.companies || []).map((c: SearchCompany) => {
+        const location = [c.city, c.state].filter(Boolean).join(', ')
+        let sublabel = location || undefined
+        if (c.verification_status === 'verified') {
+          sublabel = sublabel ? `${sublabel} · ✓ Verified` : '✓ Verified'
+        }
+        return {
+          type: 'company' as const,
+          slug: c.slug,
+          label: c.name,
+          sublabel,
+        }
+      })
       setResults([...workers, ...companies])
       setHighlight(0)
     } catch {
@@ -144,6 +165,8 @@ export default function HomeSearch() {
         >
           {loading ? (
             <div className="px-4 py-6 text-center text-soft-500 text-sm">Searching...</div>
+          ) : rateLimited ? (
+            <div className="px-4 py-6 text-center text-soft-500 text-sm">Too many searches, try again in a moment.</div>
           ) : results.length === 0 ? (
             <div className="px-4 py-6 text-center text-soft-500 text-sm">No results found.</div>
           ) : (

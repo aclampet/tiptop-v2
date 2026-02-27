@@ -351,6 +351,22 @@ Set these in project settings → Environment Variables:
 
 ## 🧪 Testing Checklist
 
+### Search API Smoke Test
+Test the search endpoint directly in your browser or with curl:
+```
+GET /api/search?q=tip
+```
+Expected response shape:
+```json
+{
+  "q": "tip",
+  "workers": [{ "slug": "...", "display_name": "...", "overall_rating": null }],
+  "companies": [{ "slug": "...", "name": "...", "city": null, "state": null, "verification_status": "..." }]
+}
+```
+- 400 if `q` < 2 characters (`{ "error": "query_too_short" }`)
+- 429 if rate limited
+
 ### Core Flows
 - [ ] Sign up creates account
 - [ ] Add position with company search
