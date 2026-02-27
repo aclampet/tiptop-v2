@@ -42,7 +42,7 @@ export default function RosterVisibility({
         }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Update failed')
+      if (!res.ok) throw new Error(data.detail || data.error || 'Update failed')
       setMessage({ type: 'success', text: 'Visibility updated!' })
       router.refresh()
     } catch (err: any) {

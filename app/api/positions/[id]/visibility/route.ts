@@ -4,7 +4,7 @@ import { createClient } from '@/supabase/server'
 // PATCH /api/positions/[id]/visibility — Update roster visibility (worker or company admin)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -13,7 +13,9 @@ export async function PATCH(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const positionId = params.id
+  // Handle params (may be Promise in Next.js 15+)
+  const resolvedParams = await Promise.resolve(context.params)
+  const positionId = resolvedParams.id
   if (!positionId) {
     return NextResponse.json({ error: 'Position ID required' }, { status: 400 })
   }
@@ -31,7 +33,7 @@ export async function PATCH(
     return NextResponse.json({ error: 'Position not found' }, { status: 404 })
   }
 
-  const { data: worker } = await supabase
+  const { data: worker, error: workerError } = await supabase
     .from('workers')
     .select('id')
     .eq('auth_user_id', user.id)
@@ -47,8 +49,16 @@ export async function PATCH(
   const isOwner = worker?.id === position.worker_id
   const isAdmin = membership && ['owner', 'admin'].includes(membership.role)
 
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('[visibility] user.id:', user.id, 'worker:', worker, 'workerError:', workerError?.message)
+    console.log('[visibility] position.worker_id:', position.worker_id, 'isOwner:', isOwner, 'isAdmin:', isAdmin)
+  }
+
   if (!isOwner && !isAdmin) {
-    return NextResponse.json({ error: 'Not authorized to update this position' }, { status: 403 })
+    return NextResponse.json({ 
+      error: 'Not authorized to update this position',
+      debug: { hasWorker: !!worker, isOwner, isAdmin, workerIdMatch: worker?.id === position.worker_id }
+    }, { status: 403 })
   }
 
   const updates: Record<string, unknown> = {}
@@ -70,6 +80,11 @@ export async function PATCH(
     return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })
   }
 
+  // Debug: log what we're about to update
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('[visibility] positionId:', positionId, 'updates:', updates, 'isOwner:', isOwner, 'isAdmin:', isAdmin)
+  }
+
   const { data: updated, error } = await supabase
     .from('positions')
     .update(updates)
@@ -79,7 +94,10 @@ export async function PATCH(
 
   if (error) {
     console.error('Error updating position visibility:', error)
-    return NextResponse.json({ error: 'Failed to update' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to update', detail: error.message, code: error.code },
+      { status: 500 }
+    )
   }
 
   return NextResponse.json({ position: updated })
