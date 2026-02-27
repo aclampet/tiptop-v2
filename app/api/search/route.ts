@@ -73,7 +73,8 @@ export async function GET(request: NextRequest) {
   )
 
   const supabase = await createClient()
-  const pattern = `${q}%`
+  // Use substring matching for better UX (matches anywhere in name/slug)
+  const pattern = `%${q}%`
 
   // Use separate ilike queries (avoid .or() encoding issues with %)
   const [workersByName, workersBySlug, companiesByName, companiesBySlug] = await Promise.all([
@@ -101,13 +102,22 @@ export async function GET(request: NextRequest) {
       .limit(limit),
   ])
 
+  // Debug logging in non-production
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('[/api/search] q:', q, 'pattern:', pattern)
+    console.log('[/api/search] workersByName:', workersByName.data?.length ?? 0, 'error:', workersByName.error?.message)
+    console.log('[/api/search] workersBySlug:', workersBySlug.data?.length ?? 0, 'error:', workersBySlug.error?.message)
+    console.log('[/api/search] companiesByName:', companiesByName.data?.length ?? 0, 'error:', companiesByName.error?.message)
+    console.log('[/api/search] companiesBySlug:', companiesBySlug.data?.length ?? 0, 'error:', companiesBySlug.error?.message)
+  }
+
   if (workersByName.error || workersBySlug.error) {
     console.error('Search workers error:', workersByName.error || workersBySlug.error)
-    return NextResponse.json({ error: 'Search failed' }, { status: 500 })
+    return NextResponse.json({ error: 'Search failed', detail: (workersByName.error || workersBySlug.error)?.message }, { status: 500 })
   }
   if (companiesByName.error || companiesBySlug.error) {
     console.error('Search companies error:', companiesByName.error || companiesBySlug.error)
-    return NextResponse.json({ error: 'Search failed' }, { status: 500 })
+    return NextResponse.json({ error: 'Search failed', detail: (companiesByName.error || companiesBySlug.error)?.message }, { status: 500 })
   }
 
   // Merge and dedupe by slug
